@@ -144,8 +144,8 @@ const style: React.CSSProperties = {
   }
 
   const hasLabel = !!(cell.label && cell.label.trim().length > 0);
-  const showLabelOverlay = !applyVisual && isSelected && hasLabel;
-
+  const showLabelOverlay =
+    !applyVisual && hasLabel && (isSelected || cell.type === 'staticText');
 
   // 🎯 Estilos SOLO del contenido (.cell-content): padding, font-size, text-align
   const contentStyle: React.CSSProperties = {};
