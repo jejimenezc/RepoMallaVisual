@@ -128,6 +128,11 @@ h2 {
   line-height: 1.2;
 }
 
+.template-cell .cell-content.placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
 /* Ayuda visual: cuando la base se expande por merge, que el contenido se mantenga legible */
 .template-cell.base-cell .cell-content {
   display: block;

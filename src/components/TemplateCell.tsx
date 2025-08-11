@@ -109,7 +109,7 @@ export const TemplateCell: React.FC<Props> = ({
     applyVisual ? (v?.fontSizePx ?? enumToPx(v?.fontSize)) : undefined;
 
   // Estilo del contenedor (.template-cell)
-  const style: React.CSSProperties = {
+const style: React.CSSProperties = {
     ...anchoredPosition,
     ...(applyVisual ? {} : editBaseStyle),
     ...spanStyle,
@@ -134,6 +134,19 @@ export const TemplateCell: React.FC<Props> = ({
       ? cell.label!.trim()
       : '';
 
+  // Placeholder para campos de texto
+  let displayPlaceholder = '';
+  if (cell.type === 'text') {
+    const ph = (cell.placeholder ?? '').trim();
+    if (ph && (applyVisual || isSelected)) {
+      displayPlaceholder = ph;
+    }
+  }
+
+  const hasLabel = !!(cell.label && cell.label.trim().length > 0);
+  const showLabelOverlay = !applyVisual && isSelected && hasLabel;
+
+
   // 🎯 Estilos SOLO del contenido (.cell-content): padding, font-size, text-align
   const contentStyle: React.CSSProperties = {};
   if (applyVisual) {
@@ -155,7 +168,7 @@ export const TemplateCell: React.FC<Props> = ({
   return (
     <div
       key={key}
-      className={`template-cell ${cell.active ? 'active' : ''} ${isSelected ? 'selected' : ''} ${isMerged ? 'merged' : ''} ${isBase ? 'base-cell' : ''}`}
+      className={`template-cell ${cell.active ? 'active' : ''} ${isSelected ? 'selected' : ''} ${isMerged ? 'merged' : ''} ${isBase ? 'base-cell' : ''} ${showLabelOverlay ? 'labelled' : ''}`}
       style={style}
       onClick={(e) => onClick(e, row, col)}
       onContextMenu={(e) => onContextMenu(e, row, col)}
@@ -164,10 +177,15 @@ export const TemplateCell: React.FC<Props> = ({
       title={displayStaticText || undefined}
       aria-label={displayStaticText || undefined}
       role="gridcell"
+      data-label={showLabelOverlay ? cell.label : undefined}
     >
       {displayStaticText ? (
         <div className="cell-content" data-kind="staticText" style={contentStyle}>
           {displayStaticText}
+        </div>
+      ) : displayPlaceholder ? (
+        <div className="cell-content placeholder" data-kind="textPlaceholder" style={contentStyle}>
+          {displayPlaceholder}
         </div>
       ) : (
         fallbackIcon || null
