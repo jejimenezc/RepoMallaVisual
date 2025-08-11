@@ -1,0 +1,57 @@
+/* src/components/ContextSidebarPanel.css */
+
+/* Título dentro del marco del layout */
+.sidebar-panel .panel-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Botonera */
+.sidebar-panel .sidebar-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-panel .sidebar-buttons button {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.sidebar-panel .sidebar-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sidebar-panel .sidebar-buttons button:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+/* Sección de formularios/config */
+.sidebar-panel .config-section {
+  border-top: 1px solid #ddd;
+  padding-top: 0.5rem;
+}
+
+.sidebar-panel .config-section h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+/* Aviso liviano cuando la acción está deshabilitada por regla */
+.sidebar-hint {
+  font-size: 0.875rem;
+  line-height: 1.3;
+  color: #6b7280;        /* gris medio */
+  background: #f3f4f6;   /* gris claro */
+  border: 1px dashed #d1d5db;
+  padding: 8px;
+  border-radius: 6px;
+}

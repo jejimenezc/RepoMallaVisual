@@ -1,0 +1,21 @@
+/* src/components/ViewAspectControls.css */
+.view-aspect-controls {
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 12px;
+}
+
+.view-aspect-controls h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.view-aspect-controls .opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-size: 14px;
+  color: #111827;
+}

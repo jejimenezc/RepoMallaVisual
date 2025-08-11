@@ -1,0 +1,65 @@
+.format-style-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.style-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.style-section label {
+  font-weight: 500;
+  color: #444;
+  font-size: 0.85rem;
+}
+
+.style-section input[type='color'],
+.style-section select {
+  width: 100%;
+  padding: 0.3rem;
+  font-size: 0.85rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.style-section input[type='checkbox'] {
+  margin-right: 0.5rem;
+}
+
+.reset-btn {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+.reset-btn:hover { background-color: #f0f0f0; }
+
+/* src/components/FormatStylePanel.css (añade) */
+.format-style-panel .control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.format-style-panel .control-row > button {
+  width: 28px;
+  height: 28px;
+  line-height: 26px;
+  text-align: center;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.format-style-panel .value-chip {
+  min-width: 48px;
+  text-align: right;
+  color: #374151;
+  font-variant-numeric: tabular-nums;
+}

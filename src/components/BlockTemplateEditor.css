@@ -1,0 +1,135 @@
+/* BlockTemplateEditor.css */
+
+.template-editor-wrapper {
+ display: contents; /* no aporta caja, solo sirve de hook para onClick/outside */
+}
+
+/* Grilla base */
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 50px);
+  grid-template-rows: repeat(10, 50px);
+  gap: 2px;
+  background-color: #ccc;
+  padding: 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Celdas */
+.template-cell {
+  background-color: white;
+  border: 1px solid #999;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 2px;
+}
+
+.template-cell.active {
+  background-color: #50dcf5;
+}
+
+.template-cell.selected {
+  outline: 2px solid #537ff7;
+  z-index: 3;
+}
+
+.template-cell.labelled::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  font-size: 0.65rem;
+  color: #333;
+  pointer-events: none;
+}
+
+.template-cell.base-cell {
+  font-weight: bold;
+}
+
+/* Estilos visuales adicionales */
+.template-cell[data-style="fontSize-small"] {
+  font-size: 0.65rem;
+}
+
+.template-cell[data-style="fontSize-large"] {
+  font-size: 0.95rem;
+}
+
+.template-cell[data-style="textAlign-left"] {
+  justify-content: flex-start;
+  text-align: left;
+  padding-left: 4px;
+}
+
+.template-cell[data-style="textAlign-right"] {
+  justify-content: flex-end;
+  text-align: right;
+  padding-right: 4px;
+}
+
+.template-cell[data-style="border-true"] {
+  border: 2px solid black;
+}
+
+/* Menú contextual */
+.template-cell .context-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: rgba(224, 235, 77, 0.897);
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 0.5rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: max-content;
+  min-width: 120px;
+}
+
+.template-cell .context-menu button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  background: #f0f0f0;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.template-cell .context-menu button:hover {
+  background: #d0eaff;
+  border-color: #1e90ff;
+}
+
+/* Encabezado */
+h2 {
+  margin-bottom: 0.5rem;
+}
+
+/* Ajuste de estilo para TemplateGrid en Editor y Visual */
+.grid-host {
+  display: contents;   /* no aporta caja, solo sirve de hook para onClick/outside */
+}
+
+/* Contenido textual real dentro de la celda */
+.template-cell .cell-content {
+  padding: 6px 8px;
+  white-space: pre-wrap;        /* respeta saltos de línea si los hay */
+  word-break: break-word;       /* evita desbordes */
+  overflow: hidden;             /* segura ante textos muy largos */
+  text-overflow: ellipsis;      /* elipsis si no cabe */
+  line-height: 1.2;
+}
+
+/* Ayuda visual: cuando la base se expande por merge, que el contenido se mantenga legible */
+.template-cell.base-cell .cell-content {
+  display: block;
+}
+

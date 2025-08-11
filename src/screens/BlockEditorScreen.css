@@ -1,0 +1,19 @@
+
+
+
+.block-editor-screen .grid-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.block-editor-screen .toolbar {
+  margin-bottom: 1rem;
+}
+
+.block-editor-screen .sidebar-panel {
+  width: 220px;
+  min-height: 300px;
+}
+
+
