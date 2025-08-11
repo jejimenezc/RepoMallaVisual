@@ -134,18 +134,22 @@ const style: React.CSSProperties = {
       ? cell.label!.trim()
       : '';
 
-  // Placeholder para campos de texto
+  // Placeholder para campos de texto (solo edición)
   let displayPlaceholder = '';
   if (cell.type === 'text') {
     const ph = (cell.placeholder ?? '').trim();
-    if (ph && (applyVisual || isSelected)) {
+    if (ph && !applyVisual) {
       displayPlaceholder = ph;
     }
   }
 
   const hasLabel = !!(cell.label && cell.label.trim().length > 0);
   const showLabelOverlay =
-    !applyVisual && hasLabel && (isSelected || cell.type === 'staticText');
+    !applyVisual &&
+    hasLabel &&
+    (isSelected || cell.type === 'staticText' || cell.type === 'text');
+
+  const showEditIcon = !applyVisual && cell.type === 'text';
 
   // 🎯 Estilos SOLO del contenido (.cell-content): padding, font-size, text-align
   const contentStyle: React.CSSProperties = {};
@@ -162,7 +166,6 @@ const style: React.CSSProperties = {
     !displayStaticText && cell.type === 'staticText' ? '𝑺' :
     cell.type === 'select' ? '🔽' :
     cell.type === 'checkbox' ? '☑️' :
-    cell.type === 'text' ? '📝' :
     '';
 
   return (
@@ -179,10 +182,20 @@ const style: React.CSSProperties = {
       role="gridcell"
       data-label={showLabelOverlay ? cell.label : undefined}
     >
+      {showEditIcon && <span className="control-icon">📝</span>}
       {displayStaticText ? (
         <div className="cell-content" data-kind="staticText" style={contentStyle}>
           {displayStaticText}
         </div>
+      ) : applyVisual && cell.type === 'text' ? (
+        <input
+          type="text"
+          placeholder={cell.placeholder}
+          className="text-input"
+          style={contentStyle}
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        />
       ) : displayPlaceholder ? (
         <div className="cell-content placeholder" data-kind="textPlaceholder" style={contentStyle}>
           {displayPlaceholder}
