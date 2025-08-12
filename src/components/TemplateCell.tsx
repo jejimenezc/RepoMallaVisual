@@ -177,6 +177,10 @@ const style: React.CSSProperties = {
     contentStyle.padding = `${py}px ${px}px`;
     if (computedFontSizePx) contentStyle.fontSize = `${computedFontSizePx}px`;
     if (v?.textAlign) contentStyle.textAlign = v.textAlign;
+    // staticText: allow cell-content to shrink vertically so parent flex can center it
+    if (cell.type === 'staticText') {
+      contentStyle.height = 'auto';
+    }
   }
 
   return (

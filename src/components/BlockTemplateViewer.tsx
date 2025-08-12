@@ -30,7 +30,8 @@ export const BlockTemplateViewer: React.FC<Props> = ({
           const tag = (e.target as HTMLElement).tagName;
           if (tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'LABEL') {
             e.preventDefault();
-          }          const cell = template[row][col];
+          }
+          const cell = template[row][col];
           const isMerged = !!cell.mergedWith;
           if (!cell.active || isMerged) return;
           onSelectCoord({ row, col });
