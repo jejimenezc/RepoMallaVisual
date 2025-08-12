@@ -1,7 +1,13 @@
 // src/types/curricular.ts
 
-export type InputType = 'staticText' | 'text' | 'checkbox' | 'select';
-
+export type InputType =
+  | 'staticText'
+  | 'text'
+  | 'checkbox'
+  | 'select'
+  | 'number'
+  | 'calculated';
+  
 export interface CellStyle {
   alignment?: 'left' | 'center' | 'right';
   bold?: boolean;
@@ -17,6 +23,7 @@ export interface BlockTemplateCell {
   dropdownOptions?: string[];  // Solo para 'select'
   mergedWith?: string;         // Referencia a la celda base: 'row-col'
   placeholder?: string;       // ✅ agregado para text
+  decimalDigits?: number;     // Solo para 'number'
   style?: CellStyle; // ✅ agregado para preview
   // Estilos visuales (solo afectan presentación)
   visualStyle?: {

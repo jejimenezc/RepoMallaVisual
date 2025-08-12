@@ -149,8 +149,10 @@ h2 {
   pointer-events: none;
 }
 
-/* Control de texto simulado en modo vista */
-.template-cell .text-input {
+/* Controles de entrada simulados en modo vista */
+.template-cell .text-input,
+.template-cell .number-input,
+.template-cell .calculated-input {
   width: 100%;
   height: 100%;
   border: 1px solid #9ca3af;
@@ -159,6 +161,17 @@ h2 {
   color: inherit;
   box-sizing: border-box;
   padding: 2px 4px;
+}
+
+/* Quitar spinners de inputs numéricos en modo vista */
+.template-cell .number-input::-webkit-outer-spin-button,
+.template-cell .number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.template-cell .number-input[type='number'] {
+  -moz-appearance: textfield;
 }
 
 /* Control checkbox simulado en modo vista */

@@ -85,6 +85,8 @@ export const BlockEditorScreen = () => {
     editorSidebar.handlers.onUpdateCell(updated, target);
   }}
   combineDisabledReason={editorSidebar?.combineDisabledReason}
+  template={template}
+
 
           />
         }

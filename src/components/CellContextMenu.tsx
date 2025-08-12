@@ -28,6 +28,8 @@ export const CellContextMenu: React.FC<CellContextMenuProps> = ({ x, y, onSelect
       <div onClick={() => handleClick('text')}>📝 Texto libre</div>
       <div onClick={() => handleClick('checkbox')}>☑️ Checkbox</div>
       <div onClick={() => handleClick('select')}>🔽 Lista desplegable</div>
+      <div onClick={() => handleClick('number')}>🔢 Número</div>
+      <div onClick={() => handleClick('calculated')}>🧮 Campo calculado</div>
       <div onClick={() => handleClick(undefined)}>🗑️ Borrar tipo</div>
     </div>
   );

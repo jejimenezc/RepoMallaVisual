@@ -2,12 +2,14 @@
 
 import React from 'react';
 import './ContextSidebarPanel.css';
-import type { BlockTemplateCell } from '../types/curricular';
+import type { BlockTemplateCell, BlockTemplate } from '../types/curricular';
 
 import  StaticTextConfigForm  from './StaticTextConfigForm';
 import { TextConfigForm } from './TextConfigForm';
 import { CheckboxConfigForm } from './CheckboxConfigForm';
 import { SelectConfigForm } from './SelectConfigForm';
+import { NumberConfigForm } from './NumberConfigForm';
+import { CalculatedConfigForm } from './CalculatedConfigForm';
 
 interface Props {
   selectedCount: number;
@@ -25,6 +27,8 @@ interface Props {
   ) => void;
 
   combineDisabledReason?: string;
+  template: BlockTemplate;
+
 }
 
 export const ContextSidebarPanel: React.FC<Props> = ({
@@ -37,6 +41,8 @@ export const ContextSidebarPanel: React.FC<Props> = ({
   selectedCoord,
   onUpdateCell,
   combineDisabledReason,
+  template,
+
 }) => {
   const patchCell = (update: Partial<BlockTemplateCell>) => {
     if (!onUpdateCell || !selectedCoord) return;
@@ -71,23 +77,38 @@ export const ContextSidebarPanel: React.FC<Props> = ({
           />
         );
 
-      case 'select':
-        return (
-          selectedCoord && (
-            <SelectConfigForm
-              cell={selectedCell}
-              coord={selectedCoord}
-              onUpdate={(u, coord) => {
-                if (onUpdateCell) onUpdateCell(u, coord);
-              }}
-            />
-          )
-        );
+    case 'select':
+      return (
+        selectedCoord && (
+          <SelectConfigForm
+            cell={selectedCell}
+            coord={selectedCoord}
+            onUpdate={(u, coord) => {
+              if (onUpdateCell) onUpdateCell(u, coord);
+            }}
+          />
+        )
+      );
+    case 'number':
+      return (
+        <NumberConfigForm
+          cell={selectedCell}
+          onUpdate={(u) => patchCell(u)}
+        />
+      );
+    case 'calculated':
+      return (
+        <CalculatedConfigForm
+          cell={selectedCell}
+          template={template}
+          onUpdate={(u) => patchCell(u)}
+        />
+      );
 
-      default:
-        return null;
-    }
-  };
+    default:
+      return null;
+  }
+};
 
   return (
     <aside className="context-sidebar-panel">

@@ -144,9 +144,9 @@ const style: React.CSSProperties = {
       ? cell.label!.trim()
       : '';
 
-  // Placeholder para campos de texto (solo edición)
+  // Placeholder para campos de texto o número (solo edición)
   let displayPlaceholder = '';
-  if (cell.type === 'text') {
+  if (cell.type === 'text' || cell.type === 'number') {
     const ph = (cell.placeholder ?? '').trim();
     if (ph && !applyVisual) {
       displayPlaceholder = ph;
@@ -166,6 +166,10 @@ const style: React.CSSProperties = {
       ? '☑️'
       : cell.type === 'select'
       ? '🔽'
+      : cell.type === 'number'
+      ? '🔢'
+      : cell.type === 'calculated'
+      ? '🧮'
       : undefined
     : undefined;
 
@@ -182,6 +186,11 @@ const style: React.CSSProperties = {
       contentStyle.height = 'auto';
     }
   }
+  
+  const numberStep =
+    cell.type === 'number'
+      ? Math.pow(10, -(cell.decimalDigits ?? 0))
+      : undefined;
 
   return (
     <div
@@ -209,6 +218,14 @@ const style: React.CSSProperties = {
           className="text-input"
           style={contentStyle}
         />
+      ) : applyVisual && cell.type === 'number' ? (
+        <input
+          type="number"
+          placeholder={cell.placeholder}
+          className="number-input"
+          style={contentStyle}
+          step={numberStep}
+        />
       ) : applyVisual && cell.type === 'checkbox' ? (
         <div className="cell-content" data-kind="checkbox" style={contentStyle}>
           <label className="checkbox-control">
@@ -222,6 +239,14 @@ const style: React.CSSProperties = {
             <option key={idx}>{opt}</option>
           ))}
         </select>
+      ) : applyVisual && cell.type === 'calculated' ? (
+        <input
+          type="text"
+          placeholder="a+b"
+          className="calculated-input"
+          style={contentStyle}
+          readOnly
+        />
       ) : displayPlaceholder ? (
         <div className="cell-content placeholder" data-kind="textPlaceholder" style={contentStyle}>
           {displayPlaceholder}

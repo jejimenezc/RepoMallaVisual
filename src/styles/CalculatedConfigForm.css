@@ -1,0 +1,37 @@
+/* CalculatedConfigForm.css */
+
+.calculated-config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.calculated-config-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #333;
+}
+
+.calculated-config-form input[type="text"] {
+  margin-top: 0.25rem;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background-color: #fafafa;
+  transition: border-color 0.2s ease;
+}
+
+.calculated-config-form input[type="text"]:focus {
+  outline: none;
+  border-color: #007acc;
+  background-color: #fff;
+}
+
+.calculated-config-form .hint {
+  font-size: 0.9rem;
+  color: #555;
+}

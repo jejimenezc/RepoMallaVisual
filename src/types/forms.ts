@@ -28,14 +28,37 @@ export interface SelectControlConfig {
 }
 
 /**
+ * Configuraciones específicas para el control de tipo "number"
+ */
+export interface NumberControlConfig {
+  placeholder?: string;
+  decimalDigits?: number;
+  required?: boolean;
+}
+
+/**
+ * Configuraciones específicas para el control de tipo "campo calculado"
+ */
+export interface CalculatedControlConfig {
+  expression?: string;
+}
+
+/**
  * Configuración común para el formulario actual de control en edición
  */
-export type ControlType = 'text' | 'checkbox' | 'select';
+export type ControlType =
+  | 'text'
+  | 'checkbox'
+  | 'select'
+  | 'number'
+  | 'calculated';
 
 export type ControlConfig =
   | { type: 'text'; config: TextControlConfig }
   | { type: 'checkbox'; config: CheckboxControlConfig }
-  | { type: 'select'; config: SelectControlConfig };
+  | { type: 'select'; config: SelectControlConfig }
+  | { type: 'number'; config: NumberControlConfig }
+  | { type: 'calculated'; config: CalculatedControlConfig };
 
 /**
  * Props genéricos para formularios de configuración de controles

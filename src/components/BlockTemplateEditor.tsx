@@ -155,6 +155,7 @@ export const BlockTemplateEditor: React.FC<Props> = ({
           label: '',
           placeholder: undefined,
           dropdownOptions: undefined,
+          decimalDigits: undefined,
         };
         return updated;
       });
@@ -172,6 +173,13 @@ export const BlockTemplateEditor: React.FC<Props> = ({
           type: type as any,
           active: true,
         };
+        if (type === 'number') {
+          updated[row][col].placeholder = '';
+          updated[row][col].decimalDigits = 0;
+        } else if (type === 'calculated') {
+          updated[row][col].placeholder = undefined;
+          updated[row][col].decimalDigits = undefined;
+        }
         return updated;
       });
 
