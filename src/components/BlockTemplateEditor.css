@@ -171,7 +171,9 @@ h2 {
 }
 
 .template-cell .number-input[type='number'] {
-  -moz-appearance: textfield;
+  -moz-appearance: textfield; /* para Firefox */
+  appearance: textfield; /* para mayoría de navegadores */
+  -webkit-appearance: none; /* para Chrome/Safari */
 }
 
 /* Control checkbox simulado en modo vista */
