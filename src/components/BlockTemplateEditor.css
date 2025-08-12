@@ -126,6 +126,8 @@ h2 {
   overflow: hidden;             /* segura ante textos muy largos */
   text-overflow: ellipsis;      /* elipsis si no cabe */
   line-height: 1.2;
+  width: 100%;
+  height: 100%;
 }
 
 .template-cell .cell-content.placeholder {
@@ -149,6 +151,27 @@ h2 {
 
 /* Control de texto simulado en modo vista */
 .template-cell .text-input {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #9ca3af;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  box-sizing: border-box;
+  padding: 2px 4px;
+}
+
+/* Control checkbox simulado en modo vista */
+.template-cell .checkbox-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+}
+
+/* Control select simulado en modo vista */
+.template-cell .select-input {
   width: 100%;
   height: 100%;
   border: 1px solid #9ca3af;

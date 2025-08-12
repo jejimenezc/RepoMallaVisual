@@ -27,8 +27,10 @@ export const BlockTemplateViewer: React.FC<Props> = ({
         template={template}
         selectedCells={selectedCells}
         onClick={(e, row, col) => {
-          e.preventDefault();
-          const cell = template[row][col];
+          const tag = (e.target as HTMLElement).tagName;
+          if (tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'LABEL') {
+            e.preventDefault();
+          }          const cell = template[row][col];
           const isMerged = !!cell.mergedWith;
           if (!cell.active || isMerged) return;
           onSelectCoord({ row, col });

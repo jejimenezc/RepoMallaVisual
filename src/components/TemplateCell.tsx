@@ -118,6 +118,16 @@ const style: React.CSSProperties = {
     ...(applyVisual && v?.backgroundColor ? { backgroundColor: v.backgroundColor } : {}),
     ...(viewFallbackBg ? { backgroundColor: viewFallbackBg } : {}),
     // ⛔️ OJO: ya NO aplicamos fontSize ni textAlign aquí
+    ...(applyVisual && v?.textAlign
+      ? {
+          justifyContent:
+            v.textAlign === 'left'
+              ? 'flex-start'
+              : v.textAlign === 'right'
+              ? 'flex-end'
+              : 'center',
+        }
+      : {}),
   };
 
   // En edición: miembros invisibles pero ocupan espacio
@@ -144,12 +154,20 @@ const style: React.CSSProperties = {
   }
 
   const hasLabel = !!(cell.label && cell.label.trim().length > 0);
-  const showLabelOverlay =
-    !applyVisual &&
-    hasLabel &&
-    (isSelected || cell.type === 'staticText' || cell.type === 'text');
+  const showLabelOverlay = !applyVisual && hasLabel;
 
-  const showEditIcon = !applyVisual && cell.type === 'text';
+  // Icono distintivo para cada tipo de control (solo en edición)
+  const controlIcon = !applyVisual
+    ? cell.type === 'text'
+      ? '📝'
+      : cell.type === 'staticText'
+      ? '🔒'
+      : cell.type === 'checkbox'
+      ? '☑️'
+      : cell.type === 'select'
+      ? '🔽'
+      : undefined
+    : undefined;
 
   // 🎯 Estilos SOLO del contenido (.cell-content): padding, font-size, text-align
   const contentStyle: React.CSSProperties = {};
@@ -160,13 +178,6 @@ const style: React.CSSProperties = {
     if (computedFontSizePx) contentStyle.fontSize = `${computedFontSizePx}px`;
     if (v?.textAlign) contentStyle.textAlign = v.textAlign;
   }
-
-  // Icono marcador solo si no hay contenido visible
-  const fallbackIcon =
-    !displayStaticText && cell.type === 'staticText' ? '𝑺' :
-    cell.type === 'select' ? '🔽' :
-    cell.type === 'checkbox' ? '☑️' :
-    '';
 
   return (
     <div
@@ -182,7 +193,7 @@ const style: React.CSSProperties = {
       role="gridcell"
       data-label={showLabelOverlay ? cell.label : undefined}
     >
-      {showEditIcon && <span className="control-icon">📝</span>}
+      {controlIcon && <span className="control-icon">{controlIcon}</span>}
       {displayStaticText ? (
         <div className="cell-content" data-kind="staticText" style={contentStyle}>
           {displayStaticText}
@@ -193,16 +204,26 @@ const style: React.CSSProperties = {
           placeholder={cell.placeholder}
           className="text-input"
           style={contentStyle}
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
         />
+      ) : applyVisual && cell.type === 'checkbox' ? (
+        <div className="cell-content" data-kind="checkbox" style={contentStyle}>
+          <label className="checkbox-control">
+            <input type="checkbox" />
+            {cell.label}
+          </label>
+        </div>
+      ) : applyVisual && cell.type === 'select' ? (
+        <select className="select-input" style={contentStyle}>
+          {(cell.dropdownOptions ?? []).map((opt, idx) => (
+            <option key={idx}>{opt}</option>
+          ))}
+        </select>
       ) : displayPlaceholder ? (
         <div className="cell-content placeholder" data-kind="textPlaceholder" style={contentStyle}>
           {displayPlaceholder}
         </div>
-      ) : (
-        fallbackIcon || null
-      )}
+            ) : null}
+
     </div>
   );
 };
