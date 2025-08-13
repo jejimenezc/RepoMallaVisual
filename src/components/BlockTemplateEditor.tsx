@@ -165,21 +165,19 @@ export const BlockTemplateEditor: React.FC<Props> = ({
         ignoreUpdatesRef.current.delete(k);
       }, 0);
     } else {
-      // Asignar nuevo tipo y activar celda
+      // Asignar nuevo tipo y activar celda, limpiando propiedades previas
       setTemplate((prev) => {
         const updated = prev.map((r) => r.map((c) => ({ ...c }))) as BlockTemplate;
         updated[row][col] = {
           ...updated[row][col],
           type: type as any,
           active: true,
+          label: '',
+          placeholder: type === 'text' || type === 'number' ? '' : undefined,
+          dropdownOptions: type === 'select' ? [] : undefined,
+          decimalDigits: type === 'number' ? 0 : undefined,
         };
-        if (type === 'number') {
-          updated[row][col].placeholder = '';
-          updated[row][col].decimalDigits = 0;
-        } else if (type === 'calculated') {
-          updated[row][col].placeholder = undefined;
-          updated[row][col].decimalDigits = undefined;
-        }
+
         return updated;
       });
 

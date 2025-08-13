@@ -5,72 +5,50 @@ import '../styles/SelectConfigForm.css';
 
 interface SelectConfigFormProps {
   cell: BlockTemplateCell;
-  coord: { row: number; col: number }; // requerido para guardar en la celda correcta
+  coord: { row: number; col: number };
   onUpdate: (updated: Partial<BlockTemplateCell>, coord: { row: number; col: number }) => void;
 }
 
-export const SelectConfigForm: React.FC<SelectConfigFormProps> = ({
-  cell,
-  coord,
-  onUpdate,
-}) => {
-  const [label, setLabel] = useState(cell.label || '');
-  const [rawOptions, setRawOptions] = useState(cell.dropdownOptions?.join(', ') || '');
-
-  // Refs para mantener los valores actualizados
-  const onUpdateRef = useRef(onUpdate);
-  const coordRef = useRef(coord);
-  const labelRef = useRef(label);
-  const rawOptionsRef = useRef(rawOptions);
+export const SelectConfigForm: React.FC<SelectConfigFormProps> = ({ cell, coord, onUpdate }) => {
+  const [label, setLabel] = useState(cell.label ?? '');
+  const [rawOptions, setRawOptions] = useState(cell.dropdownOptions?.join(', ') ?? '');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    onUpdateRef.current = onUpdate;
-  }, [onUpdate]);
-
-  useEffect(() => {
-    coordRef.current = coord;
+    setLabel(cell.label ?? '');
+    setRawOptions(cell.dropdownOptions?.join(', ') ?? '');
   }, [coord]);
 
-  // Actualiza los refs en tiempo real con los últimos valores escritos
   useEffect(() => {
-    labelRef.current = label;
-  }, [label]);
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, [coord]);
 
-  useEffect(() => {
-    rawOptionsRef.current = rawOptions;
-  }, [rawOptions]);
+  const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newLabel = e.target.value;
+    setLabel(newLabel);
+    onUpdate({ label: newLabel }, coord);
+  };
 
-  // Guardar al desmontar usando refs en vez de useState
-useEffect(() => {
-  return () => {
-    const latestLabel = labelRef.current;
-    const latestOptions = rawOptionsRef.current
+  const handleOptionsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setRawOptions(value);
+    const options = value
       .split(',')
       .map((opt) => opt.trim())
       .filter((opt) => opt.length > 0);
-
-    // Evitar guardar si ya están en blanco y sin opciones
-    if (!latestLabel && latestOptions.length === 0) return;
-
-    onUpdateRef.current(
-      {
-        label: latestLabel,
-        dropdownOptions: latestOptions,
-      },
-      coordRef.current
-    );
+    onUpdate({ dropdownOptions: options }, coord);
   };
-}, []);
 
-
-  return (
+    return (
     <div className="control-config-form select-config-form">
       <label>
         Etiqueta:
         <input
+          ref={inputRef}
           type="text"
           value={label}
-          onChange={(e) => setLabel(e.target.value)}
+          onChange={handleLabelChange}
           placeholder="Ej: Tipo de asignatura"
         />
       </label>
@@ -80,7 +58,7 @@ useEffect(() => {
         <input
           type="text"
           value={rawOptions}
-          onChange={(e) => setRawOptions(e.target.value)}
+          onChange={handleOptionsChange}
           placeholder="Ej: Obligatoria, Electiva, Optativa"
         />
       </label>

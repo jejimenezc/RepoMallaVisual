@@ -1,6 +1,6 @@
 // src/components/forms/TextConfigForm.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BlockTemplateCell } from '../types/curricular';
 import '../styles/TextConfigForm.css';
 
@@ -12,10 +12,16 @@ interface Props {
 
 export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
   const [label, setLabel] = useState(cell.label ?? '');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setLabel(cell.label ?? '');
   }, [cell.label]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, [cell]);
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLabel = e.target.value;
@@ -34,6 +40,7 @@ export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
       <label>
         Etiqueta:
         <input
+          ref={inputRef}
           type="text"
           value={label}
           onChange={handleLabelChange}
