@@ -14,7 +14,6 @@ const StaticTextConfigForm: React.FC<Props> = ({ value, coord, onChange }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(value);
 
-
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
