@@ -7,21 +7,27 @@ import '../styles/TextConfigForm.css';
 
 interface Props {
   cell: BlockTemplateCell;
+  coord: { row: number; col: number };
   onUpdate: (updated: Partial<BlockTemplateCell>) => void;
 }
 
-export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
+export const TextConfigForm: React.FC<Props> = ({ cell, coord, onUpdate }) => {
   const [label, setLabel] = useState(cell.label ?? '');
+  const [placeholder, setPlaceholder] = useState(cell.placeholder ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setLabel(cell.label ?? '');
-  }, [cell.label]);
+  }, [coord]);
+
+  useEffect(() => {
+    setPlaceholder(cell.placeholder ?? '');
+  }, [coord]);
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, [cell]);
+  }, [coord]);
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLabel = e.target.value;
@@ -30,7 +36,9 @@ export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
   };
 
   const handlePlaceholderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({ placeholder: e.target.value });
+    const newValue = e.target.value;
+    setPlaceholder(newValue);
+    onUpdate({ placeholder: newValue });
   };
 
   return (
@@ -52,7 +60,7 @@ export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
         Placeholder (texto de ayuda):
         <input
           type="text"
-          value={cell.placeholder || ''}
+          value={placeholder}
           onChange={handlePlaceholderChange}
           placeholder="Ej: Ingrese nombre completo"
         />

@@ -1,25 +1,33 @@
 // src/components/CalculatedConfigForm.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BlockTemplateCell, BlockTemplate } from '../types/curricular';
 import '../styles/CalculatedConfigForm.css';
 
 interface Props {
   cell: BlockTemplateCell;
   template: BlockTemplate;
+  coord: { row: number; col: number };
   onUpdate: (updated: Partial<BlockTemplateCell>) => void;
 }
 
-export const CalculatedConfigForm: React.FC<Props> = ({ cell, template, onUpdate }) => {
+export const CalculatedConfigForm: React.FC<Props> = ({ cell, template, coord, onUpdate }) => {
   const numberCount = template.flat().filter((c) => c.type === 'number').length;
   const inputRef = useRef<HTMLInputElement>(null);
+  const [label, setLabel] = useState(cell.label ?? '');
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, [cell]);
+  }, [coord]);
+
+  useEffect(() => {
+    setLabel(cell.label ?? '');
+  }, [coord]);
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({ label: e.target.value });
+    const newLabel = e.target.value;
+    setLabel(newLabel);
+    onUpdate({ label: newLabel });
   };
 
   return (
@@ -30,7 +38,7 @@ export const CalculatedConfigForm: React.FC<Props> = ({ cell, template, onUpdate
         <input
           ref={inputRef}
           type="text"
-          value={cell.label || ''}
+          value={label}
           onChange={handleLabelChange}
           placeholder="Ej: Total"
         />

@@ -1,24 +1,32 @@
 // src/components/CheckboxConfigForm.tsx
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BlockTemplateCell } from '../types/curricular';
 import '../styles/CheckboxConfigForm.css';
 
 export interface CheckboxConfigFormProps {
   cell: BlockTemplateCell;
+  coord: { row: number; col: number };
   onUpdate: (updated: Partial<BlockTemplateCell>) => void;
 }
 
-export const CheckboxConfigForm: React.FC<CheckboxConfigFormProps> = ({ cell, onUpdate }) => {
+export const CheckboxConfigForm: React.FC<CheckboxConfigFormProps> = ({ cell, coord, onUpdate }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [label, setLabel] = useState(cell.label ?? '');
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, [cell]);
+  }, [coord]);
+
+  useEffect(() => {
+    setLabel(cell.label ?? '');
+  }, [coord]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({ label: e.target.value });
+    const newLabel = e.target.value;
+    setLabel(newLabel);
+    onUpdate({ label: newLabel });
   };
 
   return (
@@ -28,7 +36,7 @@ export const CheckboxConfigForm: React.FC<CheckboxConfigFormProps> = ({ cell, on
         <input
           ref={inputRef}
           type="text"
-          value={cell.label || ''}
+          value={label}
           onChange={handleChange}
           placeholder="Ej: ¿Curso aprobado?"
         />

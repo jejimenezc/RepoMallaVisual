@@ -1,21 +1,33 @@
 // StaticTextConfigForm.tsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import '../styles/StaticTextConfigForm.css';
 
 
 interface Props {
   value: string;
+  coord: { row: number; col: number };
   onChange: (newValue: string) => void;
 }
 
 
-const StaticTextConfigForm: React.FC<Props> = ({ value, onChange }) => {
+const StaticTextConfigForm: React.FC<Props> = ({ value, coord, onChange }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [text, setText] = useState(value);
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, []);
+  }, [coord]);
+
+  useEffect(() => {
+    setText(value);
+  }, [coord, value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setText(newValue);
+    onChange(newValue);
+  };
 
   return (
     <div className="config-form">
@@ -23,8 +35,8 @@ const StaticTextConfigForm: React.FC<Props> = ({ value, onChange }) => {
       <input
         ref={inputRef}
         type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={text}
+        onChange={handleChange}
         placeholder="Ej. 'Créditos Totales'"
       />
     </div>
