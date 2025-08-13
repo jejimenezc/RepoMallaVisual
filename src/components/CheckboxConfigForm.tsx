@@ -6,21 +6,23 @@ import '../styles/CheckboxConfigForm.css';
 
 export interface CheckboxConfigFormProps {
   cell: BlockTemplateCell;
+  coord: { row: number; col: number };
   onUpdate: (updated: Partial<BlockTemplateCell>) => void;
 }
 
-export const CheckboxConfigForm: React.FC<CheckboxConfigFormProps> = ({ cell, onUpdate }) => {
+export const CheckboxConfigForm: React.FC<CheckboxConfigFormProps> = ({ cell, coord, onUpdate }) => 
+{
   const inputRef = useRef<HTMLInputElement>(null);
   const [label, setLabel] = useState(cell.label ?? '');
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, [cell]);
+  }, [coord]);
 
-    useEffect(() => {
+  useEffect(() => {
     setLabel(cell.label ?? '');
-  }, [cell.label]);
+  }, [coord]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLabel = e.target.value;

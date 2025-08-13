@@ -5,10 +5,11 @@ import '../styles/NumberConfigForm.css';
 
 interface Props {
   cell: BlockTemplateCell;
+  coord: { row: number; col: number };
   onUpdate: (updated: Partial<BlockTemplateCell>) => void;
 }
 
-export const NumberConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
+export const NumberConfigForm: React.FC<Props> = ({ cell, coord, onUpdate }) => {
   const [label, setLabel] = useState(cell.label ?? '');
   const [placeholder, setPlaceholder] = useState(cell.placeholder ?? '');
   const [decimalDigits, setDecimalDigits] = useState(cell.decimalDigits ?? 0);
@@ -16,20 +17,14 @@ export const NumberConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
 
   useEffect(() => {
     setLabel(cell.label ?? '');
-  }, [cell.label]);
-
-  useEffect(() => {
     setPlaceholder(cell.placeholder ?? '');
-  }, [cell.placeholder]);
-
-  useEffect(() => {
     setDecimalDigits(cell.decimalDigits ?? 0);
-  }, [cell.decimalDigits]);
+  }, [coord]);
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, [cell]);
+  }, [coord]);
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLabel = e.target.value;

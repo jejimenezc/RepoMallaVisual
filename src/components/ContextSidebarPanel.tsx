@@ -55,26 +55,35 @@ export const ContextSidebarPanel: React.FC<Props> = ({
     switch (selectedCell.type) {
       case 'staticText':
         return (
-          <StaticTextConfigForm
-            value={selectedCell.label ?? ''}
-            onChange={(newValue) => patchCell({ label: newValue })}
-          />
+          selectedCoord && (
+            <StaticTextConfigForm
+              value={selectedCell.label ?? ''}
+              coord={selectedCoord}
+              onChange={(newValue) => patchCell({ label: newValue })}
+            />
+          )
         );
 
       case 'text':
         return (
-          <TextConfigForm
-            cell={selectedCell}
-            onUpdate={(u) => patchCell(u)}
-          />
+          selectedCoord && (
+            <TextConfigForm
+              cell={selectedCell}
+              coord={selectedCoord}
+              onUpdate={(u) => patchCell(u)}
+            />
+          )
         );
 
       case 'checkbox':
         return (
-          <CheckboxConfigForm
-            cell={selectedCell}
-            onUpdate={(u) => patchCell(u)}
-          />
+          selectedCoord && (
+            <CheckboxConfigForm
+              cell={selectedCell}
+              coord={selectedCoord}
+              onUpdate={(u) => patchCell(u)}
+            />
+          )
         );
 
     case 'select':
@@ -91,18 +100,24 @@ export const ContextSidebarPanel: React.FC<Props> = ({
       );
     case 'number':
       return (
-        <NumberConfigForm
-          cell={selectedCell}
-          onUpdate={(u) => patchCell(u)}
-        />
+        selectedCoord && (
+          <NumberConfigForm
+            cell={selectedCell}
+            coord={selectedCoord}
+            onUpdate={(u) => patchCell(u)}
+          />
+        )
       );
     case 'calculated':
       return (
-        <CalculatedConfigForm
-          cell={selectedCell}
-          template={template}
-          onUpdate={(u) => patchCell(u)}
-        />
+        selectedCoord && (
+          <CalculatedConfigForm
+            cell={selectedCell}
+            template={template}
+            coord={selectedCoord}
+            onUpdate={(u) => patchCell(u)}
+          />
+        )
       );
 
     default:

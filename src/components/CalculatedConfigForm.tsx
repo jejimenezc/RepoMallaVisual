@@ -6,22 +6,23 @@ import '../styles/CalculatedConfigForm.css';
 interface Props {
   cell: BlockTemplateCell;
   template: BlockTemplate;
+  coord: { row: number; col: number };
   onUpdate: (updated: Partial<BlockTemplateCell>) => void;
 }
 
-export const CalculatedConfigForm: React.FC<Props> = ({ cell, template, onUpdate }) => {
+export const CalculatedConfigForm: React.FC<Props> = ({ cell, template, coord, onUpdate }) => {
   const numberCount = template.flat().filter((c) => c.type === 'number').length;
   const inputRef = useRef<HTMLInputElement>(null);
-    const [label, setLabel] = useState(cell.label ?? '');
+  const [label, setLabel] = useState(cell.label ?? '');
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, [cell]);
+  }, [coord]);
 
-    useEffect(() => {
+  useEffect(() => {
     setLabel(cell.label ?? '');
-  }, [cell.label]);
+  }, [coord]);
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLabel = e.target.value;

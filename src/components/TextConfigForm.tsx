@@ -7,26 +7,27 @@ import '../styles/TextConfigForm.css';
 
 interface Props {
   cell: BlockTemplateCell;
+  coord: { row: number; col: number };
   onUpdate: (updated: Partial<BlockTemplateCell>) => void;
 }
 
-export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
+export const TextConfigForm: React.FC<Props> = ({ cell, coord, onUpdate }) => {
   const [label, setLabel] = useState(cell.label ?? '');
   const [placeholder, setPlaceholder] = useState(cell.placeholder ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setLabel(cell.label ?? '');
-  }, [cell.label]);
+  }, [coord]);
 
-    useEffect(() => {
+  useEffect(() => {
     setPlaceholder(cell.placeholder ?? '');
-  }, [cell.placeholder]);
+  }, [coord]);
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, [cell]);
+  }, [coord]);
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newLabel = e.target.value;

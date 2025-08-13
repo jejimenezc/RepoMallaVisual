@@ -5,11 +5,12 @@ import '../styles/StaticTextConfigForm.css';
 
 interface Props {
   value: string;
+  coord: { row: number; col: number };
   onChange: (newValue: string) => void;
 }
 
 
-const StaticTextConfigForm: React.FC<Props> = ({ value, onChange }) => {
+const StaticTextConfigForm: React.FC<Props> = ({ value, coord, onChange }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(value);
 
@@ -17,11 +18,11 @@ const StaticTextConfigForm: React.FC<Props> = ({ value, onChange }) => {
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
-  }, []);
+  }, [coord]);
 
-    useEffect(() => {
+  useEffect(() => {
     setText(value);
-  }, [value]);
+  }, [coord, value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
