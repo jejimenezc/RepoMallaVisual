@@ -10,13 +10,23 @@ interface Props {
 
 export const NumberConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
   const [label, setLabel] = useState(cell.label ?? '');
+  const [placeholder, setPlaceholder] = useState(cell.placeholder ?? '');
+  const [decimalDigits, setDecimalDigits] = useState(cell.decimalDigits ?? 0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setLabel(cell.label ?? '');
   }, [cell.label]);
 
-    useEffect(() => {
+  useEffect(() => {
+    setPlaceholder(cell.placeholder ?? '');
+  }, [cell.placeholder]);
+
+  useEffect(() => {
+    setDecimalDigits(cell.decimalDigits ?? 0);
+  }, [cell.decimalDigits]);
+
+  useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
   }, [cell]);
@@ -28,11 +38,14 @@ export const NumberConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
   };
 
   const handlePlaceholderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({ placeholder: e.target.value });
+    const newValue = e.target.value;
+    setPlaceholder(newValue);
+    onUpdate({ placeholder: newValue });
   };
 
   const handleDecimalsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.max(0, Number(e.target.value));
+    setDecimalDigits(value);
     onUpdate({ decimalDigits: value });
   };
 
@@ -54,7 +67,7 @@ export const NumberConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
         Placeholder (texto de ayuda):
         <input
           type="text"
-          value={cell.placeholder || ''}
+          value={placeholder}
           onChange={handlePlaceholderChange}
           placeholder="Ej: 0"
         />
@@ -65,7 +78,7 @@ export const NumberConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
         <input
           type="number"
           min={0}
-          value={cell.decimalDigits ?? 0}
+          value={decimalDigits}
           onChange={handleDecimalsChange}
         />
       </label>

@@ -1,5 +1,5 @@
 // src/components/CalculatedConfigForm.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BlockTemplateCell, BlockTemplate } from '../types/curricular';
 import '../styles/CalculatedConfigForm.css';
 
@@ -12,14 +12,21 @@ interface Props {
 export const CalculatedConfigForm: React.FC<Props> = ({ cell, template, onUpdate }) => {
   const numberCount = template.flat().filter((c) => c.type === 'number').length;
   const inputRef = useRef<HTMLInputElement>(null);
+    const [label, setLabel] = useState(cell.label ?? '');
 
   useEffect(() => {
     inputRef.current?.focus();
     inputRef.current?.select();
   }, [cell]);
 
+    useEffect(() => {
+    setLabel(cell.label ?? '');
+  }, [cell.label]);
+
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({ label: e.target.value });
+    const newLabel = e.target.value;
+    setLabel(newLabel);
+    onUpdate({ label: newLabel });
   };
 
   return (
@@ -30,7 +37,7 @@ export const CalculatedConfigForm: React.FC<Props> = ({ cell, template, onUpdate
         <input
           ref={inputRef}
           type="text"
-          value={cell.label || ''}
+          value={label}
           onChange={handleLabelChange}
           placeholder="Ej: Total"
         />

@@ -12,11 +12,16 @@ interface Props {
 
 export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
   const [label, setLabel] = useState(cell.label ?? '');
+  const [placeholder, setPlaceholder] = useState(cell.placeholder ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setLabel(cell.label ?? '');
   }, [cell.label]);
+
+    useEffect(() => {
+    setPlaceholder(cell.placeholder ?? '');
+  }, [cell.placeholder]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -30,7 +35,9 @@ export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
   };
 
   const handlePlaceholderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({ placeholder: e.target.value });
+    const newValue = e.target.value;
+    setPlaceholder(newValue);
+    onUpdate({ placeholder: newValue });
   };
 
   return (
@@ -52,7 +59,7 @@ export const TextConfigForm: React.FC<Props> = ({ cell, onUpdate }) => {
         Placeholder (texto de ayuda):
         <input
           type="text"
-          value={cell.placeholder || ''}
+          value={placeholder}
           onChange={handlePlaceholderChange}
           placeholder="Ej: Ingrese nombre completo"
         />
