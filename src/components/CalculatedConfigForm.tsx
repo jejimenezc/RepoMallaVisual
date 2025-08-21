@@ -67,7 +67,13 @@ export const CalculatedConfigForm: React.FC<Props> = ({
     }
   };
 
-  const handleOperatorClick = (op: string) => () => insertToken(op);
+  const handleTokenClick = (tok: string) => () => insertToken(tok);
+
+  const handleExpressionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const sanitized = e.target.value.replace(/[^0-9rRcC+\-*/().\s]/g, '');
+    setExpression(sanitized);
+    onUpdate({ expression: sanitized });
+  };
 
   const noNumberMsg =
     'Para definir un cálculo se requieren celdas numéricas. No hay celdas numéricas en el bloque';
@@ -86,7 +92,7 @@ export const CalculatedConfigForm: React.FC<Props> = ({
         />
       </label>
       <p className="hint">
-        Se detectan {numberCells.length} campos number en el bloque
+        Se detectan {numberCells.length} campos numéricos en el bloque
       </p>
       {numberCells.length === 0 ? (
         <p className="no-number-msg">{noNumberMsg}</p>
@@ -108,13 +114,20 @@ export const CalculatedConfigForm: React.FC<Props> = ({
                 <button
                   type="button"
                   key={op}
-                  onClick={handleOperatorClick(op)}
+                  onClick={handleTokenClick(op)}
                 >
                   {op}
                 </button>
               ))}
             </div>
           </div>
+          <div className="digits">
+            {['7', '8', '9', '4', '5', '6', '1', '2', '3', '0', '.'].map((n) => (
+              <button type="button" key={n} onClick={handleTokenClick(n)}>
+                {n}
+              </button>
+            ))}
+          </div>          
           <input
             type="text"
             readOnly

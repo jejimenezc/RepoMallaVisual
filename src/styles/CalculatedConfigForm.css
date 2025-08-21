@@ -62,6 +62,17 @@
   padding: 4px 8px;
 }
 
+.expression-builder .digits button {
+  margin-right: 0;
+  padding: 4px 8px;
+}
+
+.expression-builder .digits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.25rem;
+}
+
 .expression-builder .expression-display {
   padding: 6px 10px;
   border: 1px solid #ccc;
