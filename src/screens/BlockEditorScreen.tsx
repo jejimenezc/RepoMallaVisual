@@ -111,6 +111,7 @@ export const BlockEditorScreen = () => {
           selectedCoord={selectedCoord}
           visualTemplate={visual}
           onUpdateVisual={setVisual}
+          template={template}
         />
       }
     />

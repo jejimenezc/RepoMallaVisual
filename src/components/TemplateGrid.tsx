@@ -19,8 +19,8 @@ interface Props {
   /** mapa visual (solo Viewer) */
   visualTemplate?: VisualTemplate;
   /** valores para modo vista */
-  values?: Record<string, number>;
-  onValueChange?: (key: string, value: number) => void;
+  values?: Record<string, string | number>;
+  onValueChange?: (key: string, value: string | number) => void;
 }
 
 export const TemplateGrid: React.FC<Props> = ({

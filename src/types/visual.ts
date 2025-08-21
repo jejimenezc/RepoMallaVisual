@@ -2,6 +2,10 @@
 
 export type VisualFontSize = 'small' | 'normal' | 'large';
 
+export interface ConditionalBg {
+  selectSource?: { coord: string; colors: Record<string, string> };
+}
+
 export interface VisualStyle {
   backgroundColor?: string;
   textAlign?: 'left' | 'center' | 'right';
@@ -18,6 +22,9 @@ export interface VisualStyle {
 
   /** Relleno interno vertical (px) aplicado al contenido de la celda en modo vista */
   paddingY?: number;
+
+  /** Colores de fondo condicionales */
+  conditionalBg?: ConditionalBg;
 }
 
 /** Clave = "row-col" del base (o la propia si no hay merge) */

@@ -3,17 +3,21 @@
 import React from 'react';
 import './FormatStylePanel.css';
 import { VisualTemplate, VisualStyle, coordKey } from '../types/visual';
+import type { BlockTemplate } from '../types/curricular';
+import { generatePalette } from '../utils/palette';
 
 interface FormatStylePanelProps {
   selectedCoord?: { row: number; col: number };
   visualTemplate: VisualTemplate;
   onUpdateVisual: (next: VisualTemplate) => void;
+  template: BlockTemplate;
 }
 
 export const FormatStylePanel: React.FC<FormatStylePanelProps> = ({
   selectedCoord,
   visualTemplate,
   onUpdateVisual,
+  template,
 }) => {
   if (!selectedCoord) {
     return (
@@ -44,6 +48,34 @@ export const FormatStylePanel: React.FC<FormatStylePanelProps> = ({
   const fontPx = current.fontSizePx ?? 14; // default
   const padX = current.paddingX ?? 8;
   const padY = current.paddingY ?? 6;
+
+  const selectCells = React.useMemo(() => {
+    const cells: { coord: string; options: string[] }[] = [];
+    template.forEach((row, rIdx) =>
+      row.forEach((cell, cIdx) => {
+        if (cell.type === 'select') {
+          cells.push({
+            coord: coordKey(rIdx, cIdx),
+            options: cell.dropdownOptions ?? [],
+          });
+        }
+      })
+    );
+    return cells;
+  }, [template]);
+
+  const handleSelectSourceChange = (coord: string) => {
+    if (!coord) {
+      patch({ conditionalBg: undefined });
+      return;
+    }
+    const source = selectCells.find((c) => c.coord === coord);
+    const palette = generatePalette(source?.options.length ?? 0);
+    const colors = Object.fromEntries(
+      (source?.options ?? []).map((opt, idx) => [opt, palette[idx]])
+    );
+    patch({ conditionalBg: { selectSource: { coord, colors } } });
+  };
 
   return (
     <div className="format-style-panel">
@@ -177,6 +209,52 @@ export const FormatStylePanel: React.FC<FormatStylePanelProps> = ({
           <span className="value-chip">{padY}px</span>
         </div>
       </div>
+      
+      {/* Color condicionado por select */}
+      {selectCells.length > 0 && (
+        <div className="field">
+          <label>🎯 Color según select</label>
+          <select
+            value={current.conditionalBg?.selectSource?.coord ?? ''}
+            onChange={(e) => handleSelectSourceChange(e.target.value)}
+          >
+            <option value="">(sin origen)</option>
+            {selectCells.map((c) => (
+              <option key={c.coord} value={c.coord}>
+                {c.coord}
+              </option>
+            ))}
+          </select>
+          {current.conditionalBg?.selectSource && (
+            <div className="palette-preview">
+              {Object.entries(
+                current.conditionalBg.selectSource.colors
+              ).map(([opt, color]) => (
+                <div
+                  key={opt}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    marginTop: '4px',
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 16,
+                      height: 16,
+                      backgroundColor: color,
+                      border: '1px solid #ccc',
+                      display: 'inline-block',
+                    }}
+                  />
+                  <span>{opt}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <button className="reset-btn" onClick={resetStyle}>
         ✨ Restablecer formato

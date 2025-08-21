@@ -19,9 +19,9 @@ interface Props {
   applyVisual?: boolean;
   /** mapa visual (solo para Viewer) */
   visualTemplate?: VisualTemplate;
-    /** valores ingresados en modo vista */
-  values?: Record<string, number>;
-  onValueChange?: (key: string, value: number) => void;
+  /** valores ingresados en modo vista */
+  values?: Record<string, string | number>;
+  onValueChange?: (key: string, value: string | number) => void;
 }
 
 export const TemplateCell: React.FC<Props> = ({
@@ -114,16 +114,29 @@ export const TemplateCell: React.FC<Props> = ({
 
   const computedFontSizePx =
     applyVisual ? (v?.fontSizePx ?? enumToPx(v?.fontSize)) : undefined;
+  let conditionalColor: string | undefined;
+  if (applyVisual && cell.type === 'text') {
+    const src = v?.conditionalBg?.selectSource;
+    if (src) {
+      const [sr, sc] = src.coord.split('-').map(Number);
+      const selKey = `r${sr}c${sc}`;
+      const selVal = values[selKey];
+      if (selVal !== undefined) {
+        conditionalColor = src.colors[String(selVal)];
+      }
+    }
+  }
+
+  const bgColor = conditionalColor || v?.backgroundColor || viewFallbackBg;
 
   // Estilo del contenedor (.template-cell)
-const style: React.CSSProperties = {
+  const style: React.CSSProperties = {
     ...anchoredPosition,
     ...(applyVisual ? {} : editBaseStyle),
     ...spanStyle,
     // Fondo/borde del contenedor en vista
     ...(applyVisual && v?.border ? { border: '1px solid #333' } : {}),
-    ...(applyVisual && v?.backgroundColor ? { backgroundColor: v.backgroundColor } : {}),
-    ...(viewFallbackBg ? { backgroundColor: viewFallbackBg } : {}),
+    ...(applyVisual && bgColor ? { backgroundColor: bgColor } : {}),
     // ⛔️ OJO: ya NO aplicamos fontSize ni textAlign aquí
     ...(applyVisual && v?.textAlign
       ? {
@@ -246,9 +259,16 @@ const style: React.CSSProperties = {
           </label>
         </div>
       ) : applyVisual && cell.type === 'select' ? (
-        <select className="select-input" style={contentStyle}>
+        <select 
+          className="select-input"
+          style={contentStyle}
+          value={String(values[valueKey] ?? '')}
+          onChange={(e) => onValueChange?.(valueKey, e.target.value)}          
+        >
           {(cell.dropdownOptions ?? []).map((opt, idx) => (
-            <option key={idx}>{opt}</option>
+            <option key={idx} value={opt}>
+              {opt}
+            </option>
           ))}
         </select>
       ) : applyVisual && cell.type === 'calculated' ? (
@@ -260,7 +280,7 @@ const style: React.CSSProperties = {
           readOnly
           value={(() => {
             const res = cell.expression
-              ? evaluateExpression(cell.expression, values)
+              ? evaluateExpression(cell.expression, values as Record<string, number>)
               : NaN;
             return Number.isNaN(res) ? '' : String(res);
           })()}
