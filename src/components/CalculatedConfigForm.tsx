@@ -53,7 +53,7 @@ export const CalculatedConfigForm: React.FC<Props> = ({
     onUpdate({ label: newLabel });
   };
 
-    const insertToken = (token: string) => {
+  const insertToken = (token: string) => {
     const next = (expression ?? '') + token;
     setExpression(next);
     onUpdate({ expression: next });
@@ -73,6 +73,13 @@ export const CalculatedConfigForm: React.FC<Props> = ({
     const sanitized = e.target.value.replace(/[^0-9rRcC+\-*/().\s]/g, '');
     setExpression(sanitized);
     onUpdate({ expression: sanitized });
+  };
+
+  const handleBackspace = () => {
+    if (!expression) return;
+    const next = expression.slice(0, -1);
+    setExpression(next);
+    onUpdate({ expression: next });
   };
 
   const noNumberMsg =
@@ -127,7 +134,10 @@ export const CalculatedConfigForm: React.FC<Props> = ({
                 {n}
               </button>
             ))}
-          </div>          
+            <button type="button" onClick={handleBackspace} aria-label="Borrar">
+              ⌫
+            </button>
+          </div>
           <input
             type="text"
             readOnly
