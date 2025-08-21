@@ -35,3 +35,36 @@
   font-size: 0.9rem;
   color: #555;
 }
+
+.calculated-config-form .no-number-msg {
+  font-size: 0.9rem;
+  color: #b91c1c;
+}
+
+.calculated-config-form .expression-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.expression-builder .row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.expression-builder select {
+  padding: 4px 6px;
+}
+
+.expression-builder .operators button {
+  margin-right: 0.25rem;
+  padding: 4px 8px;
+}
+
+.expression-builder .expression-display {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+}

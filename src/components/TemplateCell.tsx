@@ -3,6 +3,7 @@
 import React from 'react';
 import { BlockTemplate, BlockTemplateCell } from '../types/curricular';
 import { VisualTemplate } from '../types/visual';
+import { evaluateExpression } from '../utils/calc';
 
 interface Props {
   cell: BlockTemplateCell;
@@ -18,6 +19,9 @@ interface Props {
   applyVisual?: boolean;
   /** mapa visual (solo para Viewer) */
   visualTemplate?: VisualTemplate;
+    /** valores ingresados en modo vista */
+  values?: Record<string, number>;
+  onValueChange?: (key: string, value: number) => void;
 }
 
 export const TemplateCell: React.FC<Props> = ({
@@ -32,8 +36,11 @@ export const TemplateCell: React.FC<Props> = ({
   onMouseEnter,
   applyVisual = false,
   visualTemplate,
+  values = {},
+  onValueChange,
 }) => {
   const key = `${row}-${col}`;
+  const valueKey = `r${row}c${col}`;
   const isMerged = !!cell.mergedWith;
   const cellCoord = `${row}-${col}`;
 
@@ -225,6 +232,11 @@ const style: React.CSSProperties = {
           className="number-input"
           style={contentStyle}
           step={numberStep}
+          value={values[valueKey] ?? ''}
+          onChange={(e) => {
+            const val = parseFloat(e.target.value);
+            onValueChange?.(valueKey, Number.isNaN(val) ? 0 : val);
+          }}
         />
       ) : applyVisual && cell.type === 'checkbox' ? (
         <div className="cell-content" data-kind="checkbox" style={contentStyle}>
@@ -242,10 +254,16 @@ const style: React.CSSProperties = {
       ) : applyVisual && cell.type === 'calculated' ? (
         <input
           type="text"
-          placeholder="a+b"
+          placeholder={cell.expression ?? 'a+b'}
           className="calculated-input"
           style={contentStyle}
           readOnly
+          value={(() => {
+            const res = cell.expression
+              ? evaluateExpression(cell.expression, values)
+              : NaN;
+            return Number.isNaN(res) ? '' : String(res);
+          })()}
         />
       ) : displayPlaceholder ? (
         <div className="cell-content placeholder" data-kind="textPlaceholder" style={contentStyle}>

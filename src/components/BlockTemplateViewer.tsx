@@ -1,6 +1,6 @@
 // src/components/BlockTemplateViewer.tsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { BlockTemplate } from '../types/curricular';
 import { TemplateGrid } from './TemplateGrid';
 import { VisualTemplate } from '../types/visual';
@@ -20,6 +20,11 @@ export const BlockTemplateViewer: React.FC<Props> = ({
   onSelectCoord,
 }) => {
   const selectedCells = selectedCoord ? [selectedCoord] : [];
+  const [values, setValues] = useState<Record<string, number>>({});
+
+  const handleValueChange = (key: string, value: number) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+  };
 
   return (
     <div className="block-template-viewer">
@@ -43,6 +48,8 @@ export const BlockTemplateViewer: React.FC<Props> = ({
         onMouseLeave={() => {}}
         applyVisual={true}
         visualTemplate={visualTemplate}
+        values={values}
+        onValueChange={handleValueChange}
       />
     </div>
   );

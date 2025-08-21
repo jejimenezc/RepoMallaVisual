@@ -156,6 +156,7 @@ export const BlockTemplateEditor: React.FC<Props> = ({
           placeholder: undefined,
           dropdownOptions: undefined,
           decimalDigits: undefined,
+          expression: undefined,
         };
         return updated;
       });
@@ -176,6 +177,7 @@ export const BlockTemplateEditor: React.FC<Props> = ({
           placeholder: type === 'text' || type === 'number' ? '' : undefined,
           dropdownOptions: type === 'select' ? [] : undefined,
           decimalDigits: type === 'number' ? 0 : undefined,
+          expression: undefined,
         };
 
         return updated;

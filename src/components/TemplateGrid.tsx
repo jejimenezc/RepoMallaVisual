@@ -18,6 +18,9 @@ interface Props {
   applyVisual?: boolean;
   /** mapa visual (solo Viewer) */
   visualTemplate?: VisualTemplate;
+  /** valores para modo vista */
+  values?: Record<string, number>;
+  onValueChange?: (key: string, value: number) => void;
 }
 
 export const TemplateGrid: React.FC<Props> = ({
@@ -31,6 +34,8 @@ export const TemplateGrid: React.FC<Props> = ({
   onMouseLeave,
   applyVisual = false,
   visualTemplate,
+  values = {},
+  onValueChange,
 }) => {
   const isSelected = (r: number, c: number) =>
     selectedCells.some((s) => s.row === r && s.col === c);
@@ -52,6 +57,8 @@ export const TemplateGrid: React.FC<Props> = ({
             onMouseEnter={onMouseEnter}
             applyVisual={applyVisual}
             visualTemplate={visualTemplate}
+            values={values}
+            onValueChange={onValueChange}
           />
         ))
       )}

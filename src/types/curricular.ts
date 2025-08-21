@@ -24,6 +24,7 @@ export interface BlockTemplateCell {
   mergedWith?: string;         // Referencia a la celda base: 'row-col'
   placeholder?: string;       // ✅ agregado para text
   decimalDigits?: number;     // Solo para 'number'
+  expression?: string;        // Solo para 'calculated'
   style?: CellStyle; // ✅ agregado para preview
   // Estilos visuales (solo afectan presentación)
   visualStyle?: {
