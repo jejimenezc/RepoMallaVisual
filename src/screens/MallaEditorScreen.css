@@ -1,0 +1,39 @@
+/* src/screens/MallaEditorScreen.css */
+.malla-screen {
+  display: flex;
+  height: 100%;
+}
+
+.repository {
+  width: 200px;
+  border-right: 1px solid #ccc;
+  padding: 0.5rem;
+  background: #f9f9f9;
+}
+
+.malla-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-controls {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ccc;
+  background: #fff;
+}
+
+.malla-area {
+  flex: 1;
+  position: relative;
+  background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
+    linear-gradient(to bottom, #ddd 1px, transparent 1px);
+  background-size: calc(100% / var(--cols)) calc(100% / var(--rows));
+}
+
+.block-wrapper {
+  position: absolute;
+  cursor: move;
+}

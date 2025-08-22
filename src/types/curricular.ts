@@ -1,5 +1,7 @@
 // src/types/curricular.ts
 
+import type { VisualTemplate, BlockAspect } from './visual';
+
 export type InputType =
   | 'staticText'
   | 'text'
@@ -38,3 +40,11 @@ export interface BlockTemplateCell {
 export type BlockTemplate = BlockTemplateCell[][];
 
 
+export interface CurricularBlock {
+  id: string;
+  template: BlockTemplate;
+  visual: VisualTemplate;
+  aspect: BlockAspect;
+  x: number;
+  y: number;
+}

@@ -11,7 +11,7 @@ interface Props {
   template: BlockTemplate;
   visualTemplate: VisualTemplate;
   selectedCoord?: { row: number; col: number };
-  onSelectCoord: (coord: { row: number; col: number }) => void;
+  onSelectCoord?: (coord: { row: number; col: number }) => void;
   aspect: BlockAspect;
 
 }
@@ -44,7 +44,7 @@ export const BlockTemplateViewer: React.FC<Props> = ({
             const cell = template[row][col];
             const isMerged = !!cell.mergedWith;
             if (!cell.active || isMerged) return;
-            onSelectCoord({ row, col });
+            onSelectCoord?.({ row, col });
           }}
           onContextMenu={() => {}}
           onMouseDown={() => {}}

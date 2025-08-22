@@ -16,7 +16,17 @@ const generateEmptyTemplate = (): BlockTemplate =>
     Array.from({ length: 10 }, () => ({ active: false, label: '', type: undefined }))
   );
 
-export const BlockEditorScreen = () => {
+interface BlockEditorScreenProps {
+  onProceedToMalla?: (
+    template: BlockTemplate,
+    visual: VisualTemplate,
+    aspect: BlockAspect
+  ) => void;
+}
+
+export const BlockEditorScreen: React.FC<BlockEditorScreenProps> = ({
+  onProceedToMalla,
+}) => {
   const [mode, setMode] = useState<'edit' | 'view'>('edit');
   const [template, setTemplate] = useState<BlockTemplate>(generateEmptyTemplate());
   const [visual, setVisual] = useState<VisualTemplate>({}); // mapa visual separado
@@ -86,6 +96,9 @@ export const BlockEditorScreen = () => {
       </button>
       <button onClick={handleExport}>⬇️ Exportar</button>
       <button onClick={() => fileInputRef.current?.click()}>⬆️ Importar</button>
+      <button onClick={() => onProceedToMalla?.(template, visual, aspect)}>
+        ➡️ Malla
+      </button>
       <input
         type="file"
         accept="application/json"
