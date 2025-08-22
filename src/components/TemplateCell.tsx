@@ -1,6 +1,6 @@
 // src/components/TemplateCell.tsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { BlockTemplate, BlockTemplateCell } from '../types/curricular';
 import { VisualTemplate } from '../types/visual';
 import { evaluateExpression } from '../utils/calc';
@@ -68,6 +68,8 @@ export const TemplateCell: React.FC<Props> = ({
   // Lookup de estilo visual (solo vista)
   const baseKey = cell.mergedWith ?? key;
   const v = applyVisual ? visualTemplate?.[baseKey] : undefined;
+
+  const [checked, setChecked] = useState(false);
 
   // Vista: expandimos si todo el grupo está activo
   const allActiveInGroup =
@@ -137,6 +139,9 @@ export const TemplateCell: React.FC<Props> = ({
     // Fondo/borde del contenedor en vista
     ...(applyVisual && v?.border ? { border: '1px solid #333' } : {}),
     ...(applyVisual && bgColor ? { backgroundColor: bgColor } : {}),
+    ...(applyVisual && cell.type === 'checkbox' && checked && v?.conditionalBg?.checkedColor
+      ? { backgroundColor: v.conditionalBg.checkedColor }
+      : {}),
     // ⛔️ OJO: ya NO aplicamos fontSize ni textAlign aquí
     ...(applyVisual && v?.textAlign
       ? {
@@ -251,14 +256,18 @@ export const TemplateCell: React.FC<Props> = ({
             onValueChange?.(valueKey, Number.isNaN(val) ? 0 : val);
           }}
         />
-      ) : applyVisual && cell.type === 'checkbox' ? (
-        <div className="cell-content" data-kind="checkbox" style={contentStyle}>
-          <label className="checkbox-control">
-            <input type="checkbox" />
-            {cell.label}
-          </label>
-        </div>
-      ) : applyVisual && cell.type === 'select' ? (
+        ) : applyVisual && cell.type === 'checkbox' ? (
+          <div className="cell-content" data-kind="checkbox" style={contentStyle}>
+            <label className="checkbox-control">
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={(e) => setChecked(e.target.checked)}
+              />
+              {cell.label}
+            </label>
+          </div>
+        ) : applyVisual && cell.type === 'select' ? (
         <select 
           className="select-input"
           style={contentStyle}

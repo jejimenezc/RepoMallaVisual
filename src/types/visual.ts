@@ -24,7 +24,10 @@ export interface VisualStyle {
   paddingY?: number;
 
   /** Colores de fondo condicionales */
-  conditionalBg?: ConditionalBg;
+  conditionalBg?: ConditionalBg &{
+        /** Color de fondo para celdas marcadas */
+    checkedColor?: string;
+  };
 }
 
 /** Clave = "row-col" del base (o la propia si no hay merge) */

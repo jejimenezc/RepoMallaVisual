@@ -32,7 +32,11 @@ export const FormatStylePanel: React.FC<FormatStylePanelProps> = ({
   const current: VisualStyle = visualTemplate[k] ?? {};
 
   const patch = (p: Partial<VisualStyle>) => {
-    const next = { ...visualTemplate, [k]: { ...current, ...p } };
+    const base: VisualStyle = { ...current, ...p };
+    if ('conditionalBg' in p && p.conditionalBg === undefined) {
+      delete base.conditionalBg;
+    }
+    const next = { ...visualTemplate, [k]: base };
     onUpdateVisual(next);
   };
 
@@ -81,15 +85,47 @@ export const FormatStylePanel: React.FC<FormatStylePanelProps> = ({
     <div className="format-style-panel">
       <h3>Formato</h3>
 
-      {/* Color */}
-      <div className="field">
-        <label>🎨 Color de fondo</label>
-        <input
-          type="color"
-          value={current.backgroundColor ?? '#ffffff'}
-          onChange={(e) => patch({ backgroundColor: e.target.value })}
-        />
-      </div>
+        {/* Color */}
+        <div className="field">
+          <label>🎨 Color de fondo</label>
+          <input
+            type="color"
+            value={current.backgroundColor ?? '#ffffff'}
+            onChange={(e) => patch({ backgroundColor: e.target.value })}
+          />
+        </div>
+
+        {/* Color condicional por checkbox */}
+        <div className="field">
+          <label>
+            <input
+              type="checkbox"
+              checked={current.conditionalBg !== undefined}
+              onChange={(e) =>
+                patch({
+                  conditionalBg: e.target.checked
+                    ? current.conditionalBg ?? { checkedColor: '#ffffff' }
+                    : undefined,
+                })
+              }
+            />
+            🎯 Color al marcar
+          </label>
+          {current.conditionalBg && (
+            <input
+              type="color"
+              value={current.conditionalBg.checkedColor ?? '#ffffff'}
+              onChange={(e) =>
+                patch({
+                  conditionalBg: {
+                    ...current.conditionalBg,
+                    checkedColor: e.target.value,
+                  },
+                })
+              }
+            />
+          )}
+        </div>
 
       {/* Alineación */}
       <div className="field">
