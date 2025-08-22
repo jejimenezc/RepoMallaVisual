@@ -6,7 +6,7 @@ import { BlockTemplateViewer } from '../components/BlockTemplateViewer';
 import { ContextSidebarPanel } from '../components/ContextSidebarPanel';
 import { FormatStylePanel } from '../components/FormatStylePanel';
 import { TwoPaneLayout } from '../layout/TwoPaneLayout';
-import { VisualTemplate } from '../types/visual';
+import { VisualTemplate, BlockAspect } from '../types/visual';
 import type { EditorSidebarState } from '../types/panel';
 
 
@@ -19,6 +19,7 @@ export const BlockEditorScreen = () => {
   const [mode, setMode] = useState<'edit' | 'view'>('edit');
   const [template, setTemplate] = useState<BlockTemplate>(generateEmptyTemplate());
   const [visual, setVisual] = useState<VisualTemplate>({}); // mapa visual separado
+  const [aspect, setAspect] = useState<BlockAspect>('1/1');
 
   // Estado que publica el editor para poblar el ContextSidebarPanel
   const [editorSidebar, setEditorSidebar] = useState<EditorSidebarState | null>(null);
@@ -104,6 +105,7 @@ export const BlockEditorScreen = () => {
           visualTemplate={visual}
           selectedCoord={selectedCoord}
           onSelectCoord={setSelectedCoord}
+          aspect={aspect}
         />
       }
       right={
@@ -112,6 +114,8 @@ export const BlockEditorScreen = () => {
           visualTemplate={visual}
           onUpdateVisual={setVisual}
           template={template}
+          blockAspect={aspect}
+          onUpdateAspect={setAspect}
         />
       }
     />
