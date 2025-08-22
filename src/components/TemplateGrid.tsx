@@ -21,6 +21,8 @@ interface Props {
   /** valores para modo vista */
   values?: Record<string, string | number>;
   onValueChange?: (key: string, value: string | number) => void;
+  /** estilos opcionales para la grilla */
+  style?: React.CSSProperties;
 }
 
 export const TemplateGrid: React.FC<Props> = ({
@@ -36,12 +38,18 @@ export const TemplateGrid: React.FC<Props> = ({
   visualTemplate,
   values = {},
   onValueChange,
+  style,
 }) => {
   const isSelected = (r: number, c: number) =>
     selectedCells.some((s) => s.row === r && s.col === c);
 
   return (
-    <div className="template-grid" onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}>
+    <div
+      className="template-grid"
+      style={style}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
+    >
       {template.map((row, rIdx) =>
         row.map((cell, cIdx) => (
           <TemplateCell
