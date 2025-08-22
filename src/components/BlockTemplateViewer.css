@@ -14,13 +14,13 @@
 }
 
 /* —————————— Modo 1:1 (default) —————————— */
-.viewer-grid[data-aspect="1/1"] .template-cell {
+.viewer-grid[data-aspect="1/1"] .template-grid {
   grid-template-columns: repeat(10, 50px);
   grid-template-rows: repeat(10, 50px);
 }
 
 /* —————————— Modo 1:2 (vertical) —————————— */
-.viewer-grid[data-aspect="1/2"] .template-cell {
+.viewer-grid[data-aspect="1/2"] .template-grid {
   grid-template-columns: repeat(10, 25px);
   grid-template-rows: repeat(10, 50px);
 }
