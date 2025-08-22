@@ -1,7 +1,7 @@
 // src/utils/calc.test.ts
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateExpression } from './calc';
+import { evaluateExpression } from './calc.ts';
 
 test('evaluates basic arithmetic with parentheses', () => {
   const values = { r0c0: 2, r0c1: 3, r0c2: 4, r0c3: 1 };
