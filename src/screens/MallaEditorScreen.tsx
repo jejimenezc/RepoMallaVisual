@@ -39,25 +39,47 @@ export const MallaEditorScreen: React.FC<Props> = ({
   const gridRef = useRef<HTMLDivElement>(null);
 
   const cellWidth = aspect === '1/2' ? 25 : 50;
-  const cellHeight = aspect === '2/1' ? 25 : 50;
+  const cellHeight = aspect === '2/1' ? 50 : 25;
+
+  const blockWidth = bounds.cols * cellWidth;
+  const blockHeight = bounds.rows * cellHeight;
+
+  const previewScale = useMemo(() => {
+    const max = 180;
+    return Math.min(max / blockWidth, max / blockHeight, 1);
+  }, [blockWidth, blockHeight]);
 
   const gridAreaStyle = useMemo(
     () =>
       ({
         '--cols': String(cols),
         '--rows': String(rows),
-        width: cols * cellWidth,
-        height: rows * cellHeight,
+        width: cols * blockWidth,
+        height: rows * blockHeight,
       }) as React.CSSProperties,
-    [cols, rows, cellWidth, cellHeight]
+    [cols, rows, blockWidth, blockHeight]
   );
 
   const pieceGridStyle: React.CSSProperties = useMemo(
     () => ({
       gridTemplateColumns: `repeat(${bounds.cols}, ${cellWidth}px)`,
       gridTemplateRows: `repeat(${bounds.rows}, ${cellHeight}px)`,
+      width: blockWidth,
+      height: blockHeight,
+      pointerEvents: 'none',
     }),
-    [bounds, cellWidth, cellHeight]
+    [bounds, cellWidth, cellHeight, blockWidth, blockHeight]
+  );
+
+  const previewStyle: React.CSSProperties = useMemo(
+    () => ({
+      gridTemplateColumns: `repeat(${bounds.cols}, ${cellWidth * previewScale}px)`,
+      gridTemplateRows: `repeat(${bounds.rows}, ${cellHeight * previewScale}px)`,
+      width: blockWidth * previewScale,
+      height: blockHeight * previewScale,
+      pointerEvents: 'none',
+    }),
+    [bounds, cellWidth, cellHeight, blockWidth, blockHeight, previewScale]
   );
 
   const handleAddBlock = () => {
@@ -82,7 +104,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
-    setDragPos({ x: block.x * cellWidth, y: block.y * cellHeight });
+    setDragPos({ x: block.x * blockWidth, y: block.y * blockHeight });
     e.stopPropagation();
   };
 
@@ -91,8 +113,8 @@ export const MallaEditorScreen: React.FC<Props> = ({
     const rect = gridRef.current.getBoundingClientRect();
     let x = e.clientX - rect.left - dragOffset.current.x;
     let y = e.clientY - rect.top - dragOffset.current.y;
-    const maxX = cols * cellWidth - bounds.cols * cellWidth;
-    const maxY = rows * cellHeight - bounds.rows * cellHeight;
+    const maxX = cols * blockWidth - blockWidth;
+    const maxY = rows * blockHeight - blockHeight;
     x = Math.max(0, Math.min(x, maxX));
     y = Math.max(0, Math.min(y, maxY));
     setDragPos({ x, y });
@@ -100,8 +122,8 @@ export const MallaEditorScreen: React.FC<Props> = ({
 
   const handleMouseUp = () => {
     if (!draggingId) return;
-    const col = Math.round(dragPos.x / cellWidth);
-    const row = Math.round(dragPos.y / cellHeight);
+    const col = Math.round(dragPos.x / blockWidth);
+    const row = Math.round(dragPos.y / blockHeight);
     setBlocks((prev) =>
       prev.map((b) =>
         b.id === draggingId ? { ...b, x: col, y: row } : b
@@ -127,7 +149,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
             onMouseLeave={() => {}}
             applyVisual={true}
             visualTemplate={subVisual}
-            style={pieceGridStyle}
+            style={previewStyle}
           />
         </div>
         <button onClick={handleAddBlock}>Agregar bloque</button>
@@ -162,17 +184,16 @@ export const MallaEditorScreen: React.FC<Props> = ({
           onMouseUp={handleMouseUp}
         >
           {blocks.map((b) => {
-            const left = draggingId === b.id ? dragPos.x : b.x * cellWidth;
-            const top = draggingId === b.id ? dragPos.y : b.y * cellHeight;
-            return (
+            const left = draggingId === b.id ? dragPos.x : b.x * blockWidth;
+            const top = draggingId === b.id ? dragPos.y : b.y * blockHeight;            return (
               <div
                 key={b.id}
                 className="block-wrapper"
                 style={{
                   left,
                   top,
-                  width: bounds.cols * cellWidth,
-                  height: bounds.rows * cellHeight,
+                  width: blockWidth,
+                  height: blockHeight,
                 }}
                 onMouseDown={(e) => handleMouseDownBlock(e, b)}
               >
