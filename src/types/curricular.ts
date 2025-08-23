@@ -48,3 +48,66 @@ export interface CurricularBlock {
   x: number;
   y: number;
 }
+
+// --- NUEVO: piezas en la malla con doble modalidad ---
+
+export interface BlockSourceRef {
+  /** Identificador de la fuente; en este flujo usamos un único maestro */
+  sourceId: 'master';
+  /** Recorte activo */
+  bounds: { minRow: number; maxRow: number; minCol: number; maxCol: number; rows: number; cols: number; };
+  /** Aspecto heredado del maestro en el momento de creación (puedes recalcular si lo prefieres) */
+  aspect: BlockAspect;
+}
+
+/**
+ * Pieza viva: no almacena template/visual; los deriva del maestro + bounds.
+ */
+export interface CurricularPieceRef {
+  kind: 'ref';
+  id: string;
+  ref: BlockSourceRef;
+  x: number;
+  y: number;
+}
+
+/**
+ * Pieza congelada: almacena una copia materializada (snapshot).
+ */
+export interface CurricularPieceSnapshot {
+  kind: 'snapshot';
+  id: string;
+  template: BlockTemplate;
+  visual: VisualTemplate;
+  aspect: BlockAspect;
+  x: number;
+  y: number;
+}
+
+export type CurricularPiece = CurricularPieceRef | CurricularPieceSnapshot;
+
+export interface BlockSourceRef {
+  sourceId: 'master';
+  bounds: {
+    minRow: number;
+    maxRow: number;
+    minCol: number;
+    maxCol: number;
+    rows: number;
+    cols: number;
+  };
+  aspect: BlockAspect;
+}
+
+/** Pieza congelada: almacena copia + referencia opcional para poder "descongelar" */
+export interface CurricularPieceSnapshot {
+  kind: 'snapshot';
+  id: string;
+  template: BlockTemplate;
+  visual: VisualTemplate;
+  aspect: BlockAspect;
+  x: number;
+  y: number;
+  /** <-- NUEVO: si existe, habilita "Descongelar" (volver a referenciado) */
+  origin?: BlockSourceRef;
+}

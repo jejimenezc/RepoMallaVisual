@@ -1,5 +1,6 @@
-import { BlockTemplate } from '../types/curricular';
-import { VisualTemplate } from '../types/visual';
+// src/utils/block-active.ts
+import type { BlockTemplate, BlockTemplateCell } from '../types/curricular';
+import type { VisualTemplate } from '../types/visual';
 
 export interface ActiveBounds {
   minRow: number;
@@ -10,45 +11,160 @@ export interface ActiveBounds {
   cols: number;
 }
 
+/** Utilidad: "r-c" */
+const keyOf = (r: number, c: number) => `${r}-${c}`;
+
+/** ¿La coord está dentro de una matriz? */
+const insideMatrix = (tpl: BlockTemplate, r: number, c: number) =>
+  r >= 0 && r < tpl.length && c >= 0 && c < (tpl[0]?.length ?? 0);
+
+/** ¿Esta celda es base de un merge (alguien la referencia)? */
+const isBaseCell = (tpl: BlockTemplate, r: number, c: number) => {
+  const baseKey = keyOf(r, c);
+  return tpl.some(row => row.some(cell => cell?.mergedWith === baseKey));
+};
+
+/** Devuelve el "base" (r,c) del grupo al que pertenece la celda (o null si no hay grupo) */
+const baseOf = (tpl: BlockTemplate, r: number, c: number): { r: number; c: number } | null => {
+  const cell = tpl[r][c];
+  if (!cell) return null;
+
+  if (cell.mergedWith) {
+    // Miembro: parsear base
+    const [rs, cs] = cell.mergedWith.split('-');
+    const br = Number(rs), bc = Number(cs);
+    if (insideMatrix(tpl, br, bc)) return { r: br, c: bc };
+    return null;
+  }
+  // ¿Es base?
+  if (isBaseCell(tpl, r, c)) return { r, c };
+  return null;
+};
+
+/** Recolecta TODOS los miembros (incluye base) del grupo cuyo base es (br,bc) */
+const groupMembersOfBase = (tpl: BlockTemplate, br: number, bc: number): Array<{ r: number; c: number }> => {
+  const baseKey = keyOf(br, bc);
+  const members: Array<{ r: number; c: number }> = [{ r: br, c: bc }];
+  tpl.forEach((row, rIdx) => {
+    row.forEach((cell, cIdx) => {
+      if (cell?.mergedWith === baseKey) members.push({ r: rIdx, c: cIdx });
+    });
+  });
+  return members;
+};
+
+/**
+ * NUEVO: límites activos que SIEMPRE incluyen grupos completos.
+ * Recorre celdas activas y, si pertenecen a un grupo (base o miembro),
+ * expande los límites para abarcar TODO el grupo.
+ */
 export const getActiveBounds = (template: BlockTemplate): ActiveBounds => {
-  let minRow = template.length;
-  let minCol = template[0]?.length ?? 0;
-  let maxRow = -1;
-  let maxCol = -1;
-  template.forEach((row, r) =>
-    row.forEach((cell, c) => {
-      if (cell.active) {
+  const rowsN = template.length;
+  const colsN = template[0]?.length ?? 0;
+
+  let minRow = rowsN, minCol = colsN, maxRow = -1, maxCol = -1;
+
+  for (let r = 0; r < rowsN; r++) {
+    for (let c = 0; c < colsN; c++) {
+      const cell = template[r][c];
+      if (!cell?.active) continue;
+
+      const base = baseOf(template, r, c);
+      if (base) {
+        // Expandir por TODO el grupo
+        const members = groupMembersOfBase(template, base.r, base.c);
+        for (const m of members) {
+          if (m.r < minRow) minRow = m.r;
+          if (m.c < minCol) minCol = m.c;
+          if (m.r > maxRow) maxRow = m.r;
+          if (m.c > maxCol) maxCol = m.c;
+        }
+      } else {
+        // Celda independiente
         if (r < minRow) minRow = r;
-        if (r > maxRow) maxRow = r;
         if (c < minCol) minCol = c;
+        if (r > maxRow) maxRow = r;
         if (c > maxCol) maxCol = c;
       }
-    })
-  );
+    }
+  }
 
-  if (maxRow < minRow || maxCol < minCol) {
-    return { minRow: 0, maxRow: 0, minCol: 0, maxCol: 0, rows: 0, cols: 0 };
+  // Si no hay activas, devolver algo seguro (1x1 en 0,0)
+  if (maxRow < 0 || maxCol < 0) {
+    return { minRow: 0, minCol: 0, maxRow: 0, maxCol: 0, rows: 1, cols: 1 };
   }
 
   return {
     minRow,
-    maxRow,
     minCol,
+    maxRow,
     maxCol,
     rows: maxRow - minRow + 1,
     cols: maxCol - minCol + 1,
   };
 };
 
+/**
+ * Recorta el template a ActiveBounds, CLONANDO celdas y rebasando "mergedWith"
+ * al nuevo sistema de coordenadas relativo al recorte.
+ * Si el base de un merge quedó fuera del recorte, se remueve "mergedWith"
+ * (esa celda se trata como independiente dentro del recorte).
+ */
 export const cropTemplate = (
   template: BlockTemplate,
   b: ActiveBounds
 ): BlockTemplate => {
-  return Array.from({ length: b.rows }, (_, r) =>
-    Array.from({ length: b.cols }, (_, c) => template[b.minRow + r][b.minCol + c])
+  const rows = b.rows;
+  const cols = b.cols;
+
+  // Helper: ¿(r,c) global está dentro del recorte?
+  const inside = (r: number, c: number) =>
+    r >= b.minRow && r <= b.maxRow && c >= b.minCol && c <= b.maxCol;
+
+  // parsea "row-col" -> [r, c]
+  const parseKey = (k: string) => {
+    const [rs, cs] = k.split('-');
+    return [Number(rs), Number(cs)] as const;
+  };
+
+  // Helper: rebase de expresiones (rNcM) al nuevo origen del recorte
+  const rebaseExpr = (expr: string) =>
+    expr.replace(/r(\d+)c(\d+)/g, (_m, rs, cs) => {
+      const gr = Number(rs), gc = Number(cs);
+      const rr = gr - b.minRow, cc = gc - b.minCol;
+      // si la referencia cae fuera del recorte, reemplazamos por 0
+      return rr >= 0 && rr < b.rows && cc >= 0 && cc < b.cols ? `r${rr}c${cc}` : '0';
+    });
+  // Construir el recorte, clonando celdas y rebasando merges
+  const result: BlockTemplate = Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => {
+      const src = template[b.minRow + r][b.minCol + c];
+      const cloned: BlockTemplateCell = { ...(src as BlockTemplateCell) };
+
+      if (src?.mergedWith) {
+        const [br, bc] = parseKey(src.mergedWith); // base global
+        if (inside(br, bc)) {
+          // Rebase del base a coords relativas del recorte
+          cloned.mergedWith = keyOf(br - b.minRow, bc - b.minCol);
+        } else {
+          // Base quedó fuera: romper combinación para esta celda
+          delete cloned.mergedWith;
+        }
+      }
+
+      // ✅ Rebase de expresiones de campos calculados
+      if (src?.expression) {
+        cloned.expression = rebaseExpr(src.expression);
+      }
+      
+      return cloned;
+    })
   );
+
+  return result;
 };
 
+/** Recorta el visual a ActiveBounds, rebasando claves "r-c" al nuevo origen */
 export const cropVisualTemplate = (
   visual: VisualTemplate,
   b: ActiveBounds
@@ -56,10 +172,10 @@ export const cropVisualTemplate = (
   const result: VisualTemplate = {};
   for (let r = b.minRow; r <= b.maxRow; r++) {
     for (let c = b.minCol; c <= b.maxCol; c++) {
-      const key = `${r}-${c}`;
+      const key = keyOf(r, c);
       const style = visual[key];
       if (style) {
-        const newKey = `${r - b.minRow}-${c - b.minCol}`;
+        const newKey = keyOf(r - b.minRow, c - b.minCol);
         result[newKey] = style;
       }
     }

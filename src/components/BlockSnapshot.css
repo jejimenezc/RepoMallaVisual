@@ -1,0 +1,13 @@
+/* src/components/BlockSnapshot.css */
+.snapshot-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: grid;
+  place-items: start;
+  background: transparent;
+}
+
+.snapshot-scale {
+  will-change: transform;
+}

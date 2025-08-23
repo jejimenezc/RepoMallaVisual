@@ -5,10 +5,13 @@
 }
 
 .repository {
-  width: 200px;
+  width: 240px;
   border-right: 1px solid #ccc;
   padding: 0.5rem;
   background: #f9f9f9;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto; /* título, snapshot, botones agregar */
+  gap: 0.5rem;
 }
 
 .malla-wrapper {
@@ -36,4 +39,47 @@
 .block-wrapper {
   position: absolute;
   cursor: move;
+}
+
+.repo-snapshot {
+  min-height: 160px;
+  height: 100%;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.repo-actions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.repo-actions button {
+  width: 100%;
+}
+
+/* Toolbar flotante por pieza (arriba a la derecha) */
+.piece-toolbar {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 4px;
+  z-index: 1000;
+}
+
+.piece-toolbar button {
+  font-size: 12px;
+  padding: 2px 6px;
+  line-height: 1.2;
+  border: 1px solid #bbb;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.piece-toolbar button:hover {
+  background: #f0f0f0;
 }
