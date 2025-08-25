@@ -1,6 +1,6 @@
 // src/components/TemplateCell.tsx
 
-import React, { useState } from 'react';
+import React from 'react';
 import { BlockTemplate, BlockTemplateCell } from '../types/curricular.ts';
 import { VisualTemplate } from '../types/visual.ts';
 import { evaluateExpression } from '../utils/calc.ts';
@@ -20,8 +20,8 @@ interface Props {
   /** mapa visual (solo para Viewer) */
   visualTemplate?: VisualTemplate;
   /** valores ingresados en modo vista */
-  values?: Record<string, string | number>;
-  onValueChange?: (key: string, value: string | number) => void;
+  values?: Record<string, string | number | boolean>;
+  onValueChange?: (key: string, value: string | number | boolean) => void;
 }
 
 export const TemplateCell: React.FC<Props> = ({
@@ -57,7 +57,7 @@ export const TemplateCell: React.FC<Props> = ({
     )
     .filter((v): v is { row: number; col: number } => v !== undefined);
 
-    const [checked, setChecked] = useState(false);
+  const checked = Boolean(values[valueKey]);
 
     // --- VISIBILIDAD ---
     if (applyVisual) {
@@ -242,27 +242,29 @@ export const TemplateCell: React.FC<Props> = ({
           placeholder={cell.placeholder}
           className="text-input"
           style={contentStyle}
+          value={String(values[valueKey] ?? '')}
+          onChange={(e) => onValueChange?.(valueKey, e.target.value)}
         />
       ) : applyVisual && cell.type === 'number' ? (
-        <input
-          type="number"
-          placeholder={cell.placeholder}
-          className="number-input"
-          style={contentStyle}
-          step={numberStep}
-          value={values[valueKey] ?? ''}
-          onChange={(e) => {
-            const val = parseFloat(e.target.value);
-            onValueChange?.(valueKey, Number.isNaN(val) ? 0 : val);
-          }}
-        />
+          <input
+            type="number"
+            placeholder={cell.placeholder}
+            className="number-input"
+            style={contentStyle}
+            step={numberStep}
+            value={typeof values[valueKey] === 'number' ? values[valueKey] : ''}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value);
+              onValueChange?.(valueKey, Number.isNaN(val) ? 0 : val);
+            }}
+          />
         ) : applyVisual && cell.type === 'checkbox' ? (
           <div className="cell-content" data-kind="checkbox" style={contentStyle}>
             <label className="checkbox-control">
               <input
                 type="checkbox"
                 checked={checked}
-                onChange={(e) => setChecked(e.target.checked)}
+                onChange={(e) => onValueChange?.(valueKey, e.target.checked)}
               />
               {cell.label}
             </label>

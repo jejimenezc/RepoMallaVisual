@@ -24,9 +24,9 @@ export const BlockTemplateViewer: React.FC<Props> = ({
   aspect,
 }) => {
   const selectedCells = selectedCoord ? [selectedCoord] : [];
-  const [values, setValues] = useState<Record<string, string | number>>({});
+  const [values, setValues] = useState<Record<string, string | number | boolean>>({});
 
-  const handleValueChange = (key: string, value: string | number) => {
+  const handleValueChange = (key: string, value: string | number | boolean) => {
     setValues((prev) => ({ ...prev, [key]: value }));
   };
 

@@ -19,8 +19,8 @@ interface Props {
   /** mapa visual (solo Viewer) */
   visualTemplate?: VisualTemplate;
   /** valores para modo vista */
-  values?: Record<string, string | number>;
-  onValueChange?: (key: string, value: string | number) => void;
+  values?: Record<string, string | number | boolean>;
+  onValueChange?: (key: string, value: string | number | boolean) => void;
   /** estilos opcionales para la grilla */
   style?: React.CSSProperties;
 }

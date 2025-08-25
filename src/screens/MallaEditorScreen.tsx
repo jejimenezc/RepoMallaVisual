@@ -14,7 +14,6 @@ import {
   cropVisualTemplate,
   getActiveBounds,
   expandBoundsToMerges,
-
 } from '../utils/block-active.ts';
 import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
 import { duplicateActiveCrop } from '../utils/block-clone.ts';
@@ -77,7 +76,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
   const [cols, setCols] = useState(5);
   const [rows, setRows] = useState(5);
   const [pieces, setPieces] = useState<CurricularPiece[]>([]);
-  const [pieceValues, setPieceValues] = useState<Record<string, Record<string, string | number>>>({});
+  const [pieceValues, setPieceValues] = useState<Record<string, Record<string, string | number | boolean>>>({});
   const [floatingPieces, setFloatingPieces] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -388,7 +387,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
             const top = draggingId === p.id ? dragPos.y : p.y * baseMetrics.outerH;
 
             const values = pieceValues[p.id] ?? {};
-            const onValueChange = (key: string, value: string | number) => {
+            const onValueChange = (key: string, value: string | number | boolean) => {
               setPieceValues((prev) => ({
                 ...prev,
                 [p.id]: { ...(prev[p.id] ?? {}), [key]: value },
