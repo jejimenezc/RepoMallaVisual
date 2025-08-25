@@ -11,7 +11,7 @@ export interface MallaExport {
   };
   grid?: { cols: number; rows: number };
   pieces: CurricularPiece[];
-  values: Record<string, Record<string, string | number>>;
+  values: Record<string, Record<string, string | number | boolean>>;
   floatingPieces?: string[];
 }
 

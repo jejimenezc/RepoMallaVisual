@@ -20,6 +20,11 @@ export default function App(): JSX.Element {
     visual: VisualTemplate,
     aspect: BlockAspect
   ) => {
+    try {
+      window.localStorage.removeItem('malla-editor-state');
+    } catch {
+      /* ignore */
+    }
     setBlock({ template, visual, aspect });
     setStage('malla');
   };
@@ -37,6 +42,7 @@ export default function App(): JSX.Element {
             visual={block.visual}
             aspect={block.aspect}
             onBack={() => setStage('block')}
+            onUpdateMaster={setBlock}
           />
         )}
       </main>

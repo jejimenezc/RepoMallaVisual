@@ -17,6 +17,7 @@ import {
 } from '../utils/block-active.ts';
 import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
 import { duplicateActiveCrop } from '../utils/block-clone.ts';
+import { exportMalla, importMalla } from '../utils/malla-io.ts';
 import './MallaEditorScreen.css';
 
 /** Mantener estos valores en sync con .template-grid (BlockTemplateEditor.css) */
@@ -59,6 +60,13 @@ interface Props {
   visual: VisualTemplate;
   aspect: BlockAspect;
   onBack?: () => void;
+  onUpdateMaster?: React.Dispatch<
+    React.SetStateAction<{
+      template: BlockTemplate;
+      visual: VisualTemplate;
+      aspect: BlockAspect;
+    } | null>
+  >;
 }
 
 export const MallaEditorScreen: React.FC<Props> = ({
@@ -66,6 +74,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
   visual,
   aspect,
   onBack,
+  onUpdateMaster,
 }) => {
   // --- maestro + recorte activo
   const bounds = useMemo(() => getActiveBounds(template), [template]);
@@ -79,6 +88,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
   const [pieceValues, setPieceValues] = useState<Record<string, Record<string, string | number | boolean>>>({});
   const [floatingPieces, setFloatingPieces] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const saveTimer = useRef<number | null>(null);
 
   // --- drag & drop
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -100,8 +110,19 @@ export const MallaEditorScreen: React.FC<Props> = ({
 
     // --- persistencia
   const handleSave = () => {
-    const data = { master: { template, visual, aspect }, pieces, values: pieceValues };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const json = exportMalla({
+      master: { template, visual, aspect },
+      grid: { cols, rows },
+      pieces,
+      values: pieceValues,
+      floatingPieces,
+    });
+    try {
+      window.localStorage.setItem(STORAGE_KEY, json);
+    } catch {
+      /* ignore */
+    }
+    const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -120,9 +141,22 @@ export const MallaEditorScreen: React.FC<Props> = ({
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const parsed = JSON.parse(String(ev.target?.result));
-        if (parsed.pieces) setPieces(parsed.pieces);
-        if (parsed.values) setPieceValues(parsed.values);
+        const data = importMalla(String(ev.target?.result));
+        onUpdateMaster?.({
+          template: data.master.template,
+          visual: data.master.visual,
+          aspect: data.master.aspect,
+        });
+        setCols(data.grid?.cols ?? 5);
+        setRows(data.grid?.rows ?? 5);
+        setPieces(data.pieces);
+        setPieceValues(data.values);
+        setFloatingPieces(data.floatingPieces ?? []);
+        try {
+          window.localStorage.setItem(STORAGE_KEY, String(ev.target?.result));
+        } catch {
+          /* ignore */
+        }
       } catch (err) {
         console.error('Error loading malla:', err);
       }
@@ -133,27 +167,43 @@ export const MallaEditorScreen: React.FC<Props> = ({
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const data = { master: { template, visual, aspect }, pieces, values: pieceValues };
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch {
-      /* ignore */
-    }
-  }, [template, visual, aspect, pieces, pieceValues]);
+    if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
+    saveTimer.current = window.setTimeout(() => {
+      try {
+        const json = exportMalla({
+          master: { template, visual, aspect },
+          grid: { cols, rows },
+          pieces,
+          values: pieceValues,
+          floatingPieces,
+        });
+        window.localStorage.setItem(STORAGE_KEY, json);
+      } catch {
+        /* ignore */
+      }
+    }, 300);
+  }, [template, visual, aspect, cols, rows, pieces, pieceValues, floatingPieces]);
 
-  useEffect(() => {
+  const handleRestoreDraft = () => {
     if (typeof window === 'undefined') return;
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed.pieces) setPieces(parsed.pieces);
-        if (parsed.values) setPieceValues(parsed.values);
-      }
-    } catch {
-      /* ignore */
+      if (!raw) return;
+      const data = importMalla(raw);
+      onUpdateMaster?.({
+        template: data.master.template,
+        visual: data.master.visual,
+        aspect: data.master.aspect,
+      });
+      setCols(data.grid?.cols ?? 5);
+      setRows(data.grid?.rows ?? 5);
+      setPieces(data.pieces);
+      setPieceValues(data.values);
+      setFloatingPieces(data.floatingPieces ?? []);
+    } catch (err) {
+      console.error('Error restoring draft:', err);
     }
-  }, []);
+  };
 
   // --- agregar piezas
   const handleAddReferenced = () => {
@@ -341,6 +391,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
           <div className="persist-controls">
             <button type="button" onClick={handleSave}>Guardar</button>
             <button type="button" onClick={handleLoadClick}>Cargar</button>
+            <button type="button" onClick={handleRestoreDraft}>Recuperar borrador</button>
             <input
               type="file"
               accept="application/json"
