@@ -182,3 +182,71 @@ export const cropVisualTemplate = (
   }
   return result;
 };
+
+// --- NUEVO: expande bounds a merges vigentes del maestro ---
+export const expandBoundsToMerges = (
+  template: BlockTemplate,
+  b: ActiveBounds
+): ActiveBounds => {
+  // Partimos de los bounds dados
+  let minRow = b.minRow, minCol = b.minCol, maxRow = b.maxRow, maxCol = b.maxCol;
+
+  const rowsN = template.length;
+  const colsN = template[0]?.length ?? 0;
+  const keyOf = (r: number, c: number) => `${r}-${c}`;
+
+  const isInside = (r: number, c: number) =>
+    r >= 0 && r < rowsN && c >= 0 && c < colsN;
+
+  // Detectar si la celda pertenece a un grupo y traer todos sus miembros
+  const groupMembersOf = (r: number, c: number): Array<{ r: number; c: number }> => {
+    const cell = template[r][c];
+    if (!cell) return [];
+    let br = r, bc = c;
+
+    if (cell.mergedWith) {
+      const [rs, cs] = cell.mergedWith.split('-');
+      br = Number(rs); bc = Number(cs);
+    } else {
+      // ¿esta celda es base de alguien?
+      const baseKey = keyOf(r, c);
+      const someRef = template.some(row => row.some(cel => cel?.mergedWith === baseKey));
+      if (!someRef) return []; // no pertenece a ningún grupo
+    }
+
+    const baseKey = keyOf(br, bc);
+    const members: Array<{ r: number; c: number }> = [{ r: br, c: bc }];
+    template.forEach((row, rIdx) => {
+      row.forEach((cel, cIdx) => {
+        if (cel?.mergedWith === baseKey) members.push({ r: rIdx, c: cIdx });
+      });
+    });
+    return members;
+  };
+
+  // Expandimos iterativamente hasta estabilizar
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (let r = minRow; r <= maxRow; r++) {
+      for (let c = minCol; c <= maxCol; c++) {
+        if (!isInside(r, c)) continue;
+        const members = groupMembersOf(r, c);
+        if (members.length === 0) continue; // no es grupo
+
+        for (const m of members) {
+          if (m.r < minRow) { minRow = m.r; changed = true; }
+          if (m.c < minCol) { minCol = m.c; changed = true; }
+          if (m.r > maxRow) { maxRow = m.r; changed = true; }
+          if (m.c > maxCol) { maxCol = m.c; changed = true; }
+        }
+      }
+    }
+  }
+
+  return {
+    minRow, minCol, maxRow, maxCol,
+    rows: maxRow - minRow + 1,
+    cols: maxCol - minCol + 1,
+  };
+};

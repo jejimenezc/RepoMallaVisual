@@ -13,6 +13,8 @@ import {
   cropTemplate,
   cropVisualTemplate,
   getActiveBounds,
+  expandBoundsToMerges,  
+
 } from '../utils/block-active';
 import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
 import { duplicateActiveCrop } from '../utils/block-clone';
@@ -283,9 +285,27 @@ export const MallaEditorScreen: React.FC<Props> = ({
           onMouseUp={handleMouseUp}
         >
           {pieces.map((p) => {
-            const pieceAspect = p.kind === 'ref' ? p.ref.aspect : p.aspect;
-            const pieceTemplate = p.kind === 'ref' ? cropTemplate(template, p.ref.bounds) : p.template;
-            const pieceVisual = p.kind === 'ref' ? cropVisualTemplate(visual, p.ref.bounds) : p.visual;
+          // --- calculo de template/visual/aspect por pieza (con expansión de merges para referenciadas)
+            let pieceTemplate: BlockTemplate;
+            let pieceVisual: VisualTemplate;
+            let pieceAspect: BlockAspect;
+            if (p.kind === 'ref') {
+              // Expande los bounds guardados a los merges vigentes del maestro
+              const safeBounds = expandBoundsToMerges(template, p.ref.bounds);
+
+              pieceTemplate = cropTemplate(template, safeBounds);
+              pieceVisual   = cropVisualTemplate(visual, safeBounds);
+
+              // Si quieres que sigan el aspecto del maestro “en vivo”, usa `aspect` aquí:
+              // pieceAspect = aspect;
+              // Si prefieres que usen el aspecto con el que se crearon:
+              pieceAspect = p.ref.aspect;
+            } else {
+              // Snapshot: usa su copia materializada tal cual
+              pieceTemplate = p.template;
+              pieceVisual   = p.visual;
+              pieceAspect   = p.aspect;
+            }
 
             const m = computeMetrics(pieceTemplate, pieceAspect);
 
