@@ -1,5 +1,5 @@
 // src/screens/MallaEditorScreen.tsx
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   BlockTemplate,
   CurricularPiece,
@@ -23,6 +23,7 @@ import './MallaEditorScreen.css';
 /** Mantener estos valores en sync con .template-grid (BlockTemplateEditor.css) */
 const GRID_GAP = 2; // px
 const GRID_PAD = 4; // px
+const STORAGE_KEY = 'malla-editor-state';
 
 /** Cálculo unificado de métricas de una pieza (recorte) */
 function computeMetrics(tpl: BlockTemplate, aspect: BlockAspect) {
@@ -78,6 +79,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
   const [pieces, setPieces] = useState<CurricularPiece[]>([]);
   const [pieceValues, setPieceValues] = useState<Record<string, Record<string, string | number>>>({});
   const [floatingPieces, setFloatingPieces] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- drag & drop
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -96,6 +98,63 @@ export const MallaEditorScreen: React.FC<Props> = ({
       }) as React.CSSProperties,
     [cols, rows, baseMetrics.outerW, baseMetrics.outerH]
   );
+
+    // --- persistencia
+  const handleSave = () => {
+    const data = { master: { template, visual, aspect }, pieces, values: pieceValues };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'malla.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleLoadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(String(ev.target?.result));
+        if (parsed.pieces) setPieces(parsed.pieces);
+        if (parsed.values) setPieceValues(parsed.values);
+      } catch (err) {
+        console.error('Error loading malla:', err);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const data = { master: { template, visual, aspect }, pieces, values: pieceValues };
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      /* ignore */
+    }
+  }, [template, visual, aspect, pieces, pieceValues]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.pieces) setPieces(parsed.pieces);
+        if (parsed.values) setPieceValues(parsed.values);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // --- agregar piezas
   const handleAddReferenced = () => {
@@ -280,6 +339,17 @@ export const MallaEditorScreen: React.FC<Props> = ({
             Columnas
             <input type="number" min={1} value={cols} onChange={(e) => setCols(Number(e.target.value))} />
           </label>
+          <div className="persist-controls">
+            <button type="button" onClick={handleSave}>Guardar</button>
+            <button type="button" onClick={handleLoadClick}>Cargar</button>
+            <input
+              type="file"
+              accept="application/json"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+          </div>
         </div>
 
         <div
