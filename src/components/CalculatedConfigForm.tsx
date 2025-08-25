@@ -1,6 +1,6 @@
 // src/components/CalculatedConfigForm.tsx
 import React, { useEffect, useRef, useState } from 'react';
-import { BlockTemplateCell, BlockTemplate } from '../types/curricular';
+import { BlockTemplateCell, BlockTemplate } from '../types/curricular.ts';
 import '../styles/CalculatedConfigForm.css';
 
 interface Props {
@@ -68,12 +68,6 @@ export const CalculatedConfigForm: React.FC<Props> = ({
   };
 
   const handleTokenClick = (tok: string) => () => insertToken(tok);
-
-  const handleExpressionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const sanitized = e.target.value.replace(/[^0-9rRcC+\-*/().\s]/g, '');
-    setExpression(sanitized);
-    onUpdate({ expression: sanitized });
-  };
 
   const handleBackspace = () => {
     if (!expression) return;

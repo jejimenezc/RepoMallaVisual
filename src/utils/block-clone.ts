@@ -1,7 +1,7 @@
 // src/utils/block-clone.ts
-import type { BlockTemplate } from '../types/curricular';
-import type { VisualTemplate, BlockAspect } from '../types/visual';
-import { getActiveBounds, cropTemplate, cropVisualTemplate } from './block-active';
+import type { BlockTemplate } from '../types/curricular.ts';
+import type { VisualTemplate, BlockAspect } from '../types/visual.ts';
+import { getActiveBounds, cropTemplate, cropVisualTemplate } from './block-active.ts';
 
 export interface BlockData {
   template: BlockTemplate;

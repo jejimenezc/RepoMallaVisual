@@ -2,8 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { exportBlock, importBlock } from './block-io.ts';
-import type { BlockTemplate } from '../types/curricular';
-import type { VisualTemplate, BlockAspect } from '../types/visual';
+import type { BlockTemplate } from '../types/curricular.ts';
+import type { VisualTemplate, BlockAspect } from '../types/visual.ts';
 
 test('export followed by import yields same block', () => {
   const template: BlockTemplate = [

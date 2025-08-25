@@ -1,11 +1,11 @@
 // src/components/BlockTemplateEditor.tsx
 
-import { useState, useEffect, useRef } from 'react';
-import { BlockTemplate, BlockTemplateCell } from '../types/curricular';
+import React, { useState, useEffect, useRef } from 'react';
+import { BlockTemplate, BlockTemplateCell, InputType } from '../types/curricular.ts';
 import { CellContextMenu } from './CellContextMenu';
 import { TemplateGrid } from './TemplateGrid';
 import './BlockTemplateEditor.css';
-import type { EditorSidebarState } from '../types/panel';
+import type { EditorSidebarState } from '../types/panel.ts';
 
 interface Props {
   template: BlockTemplate;
@@ -138,7 +138,7 @@ export const BlockTemplateEditor: React.FC<Props> = ({
   };
 
   // Menú contextual: asignar tipo / borrar tipo
-  const handleSetInputType = (type: string | undefined) => {
+  const handleSetInputType = (type: InputType | undefined) => {
     if (!contextMenu) return;
     const { row, col } = contextMenu;
     const k = coordKey(row, col);
@@ -171,7 +171,7 @@ export const BlockTemplateEditor: React.FC<Props> = ({
         const updated = prev.map((r) => r.map((c) => ({ ...c }))) as BlockTemplate;
         updated[row][col] = {
           ...updated[row][col],
-          type: type as any,
+          type,
           active: true,
           label: '',
           placeholder: type === 'text' || type === 'number' ? '' : undefined,

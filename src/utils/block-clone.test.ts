@@ -2,8 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { duplicateBlock } from './block-clone.ts';
-import type { BlockTemplate } from '../types/curricular';
-import type { VisualTemplate } from '../types/visual';
+import type { BlockTemplate } from '../types/curricular.ts';
+import type { VisualTemplate } from '../types/visual.ts';
 
 test('duplicateBlock creates independent copy', () => {
   const template: BlockTemplate = [[{ active: true, label: 'A' }]];

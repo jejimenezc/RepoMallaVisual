@@ -13,7 +13,6 @@ export function evaluateExpression(
   });
   try {
     if (/[^0-9+\-*/().\s]/.test(replaced)) return NaN;
-    // eslint-disable-next-line no-new-func
     const result = Function(`"use strict"; return (${replaced});`)();
     return typeof result === 'number' && !isNaN(result) ? result : NaN;
   } catch {

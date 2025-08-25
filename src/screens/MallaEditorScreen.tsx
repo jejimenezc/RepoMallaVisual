@@ -6,18 +6,18 @@ import type {
   CurricularPieceRef,
   CurricularPieceSnapshot,
   BlockSourceRef,
-} from '../types/curricular';
+} from '../types/curricular.ts';
 import { TemplateGrid } from '../components/TemplateGrid';
-import type { VisualTemplate, BlockAspect } from '../types/visual';
+import type { VisualTemplate, BlockAspect } from '../types/visual.ts';
 import {
   cropTemplate,
   cropVisualTemplate,
   getActiveBounds,
-  expandBoundsToMerges,  
+  expandBoundsToMerges,
 
-} from '../utils/block-active';
+} from '../utils/block-active.ts';
 import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
-import { duplicateActiveCrop } from '../utils/block-clone';
+import { duplicateActiveCrop } from '../utils/block-clone.ts';
 import './MallaEditorScreen.css';
 
 /** Mantener estos valores en sync con .template-grid (BlockTemplateEditor.css) */
@@ -70,7 +70,6 @@ export const MallaEditorScreen: React.FC<Props> = ({
   // --- maestro + recorte activo
   const bounds = useMemo(() => getActiveBounds(template), [template]);
   const subTemplate = useMemo(() => cropTemplate(template, bounds), [template, bounds]);
-  const subVisual = useMemo(() => cropVisualTemplate(visual, bounds), [visual, bounds]);
   const baseMetrics = useMemo(() => computeMetrics(subTemplate, aspect), [subTemplate, aspect]);
 
   // --- malla y piezas

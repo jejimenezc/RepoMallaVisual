@@ -1,9 +1,9 @@
 // src/components/TemplateCell.tsx
 
 import React, { useState } from 'react';
-import { BlockTemplate, BlockTemplateCell } from '../types/curricular';
-import { VisualTemplate } from '../types/visual';
-import { evaluateExpression } from '../utils/calc';
+import { BlockTemplate, BlockTemplateCell } from '../types/curricular.ts';
+import { VisualTemplate } from '../types/visual.ts';
+import { evaluateExpression } from '../utils/calc.ts';
 
 interface Props {
   cell: BlockTemplateCell;
@@ -57,19 +57,19 @@ export const TemplateCell: React.FC<Props> = ({
     )
     .filter((v): v is { row: number; col: number } => v !== undefined);
 
-  // --- VISIBILIDAD ---
-  if (applyVisual) {
-    // Vista: solo activas; miembros no renderizan
-    if (!cell.active) return null;
-    if (isMerged && !isBase) return null;
-  }
-  // Edición: nunca return null (miembros quedan invisibles pero ocupan su celda)
+    const [checked, setChecked] = useState(false);
 
-  // Lookup de estilo visual (solo vista)
-  const baseKey = cell.mergedWith ?? key;
-  const v = applyVisual ? visualTemplate?.[baseKey] : undefined;
+    // --- VISIBILIDAD ---
+    if (applyVisual) {
+      // Vista: solo activas; miembros no renderizan
+      if (!cell.active) return null;
+      if (isMerged && !isBase) return null;
+    }
+    // Edición: nunca return null (miembros quedan invisibles pero ocupan su celda)
 
-  const [checked, setChecked] = useState(false);
+    // Lookup de estilo visual (solo vista)
+    const baseKey = cell.mergedWith ?? key;
+    const v = applyVisual ? visualTemplate?.[baseKey] : undefined;
 
   // Vista: expandimos si todo el grupo está activo
   const allActiveInGroup =

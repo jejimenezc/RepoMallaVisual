@@ -1,6 +1,6 @@
 // src/utils/block-active.ts
-import type { BlockTemplate, BlockTemplateCell } from '../types/curricular';
-import type { VisualTemplate } from '../types/visual';
+import type { BlockTemplate, BlockTemplateCell } from '../types/curricular.ts';
+import type { VisualTemplate } from '../types/visual.ts';
 
 export interface ActiveBounds {
   minRow: number;

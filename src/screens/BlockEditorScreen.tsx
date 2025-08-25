@@ -1,14 +1,14 @@
 // src/screens/BlockEditorScreen.tsx
-import { useState, useEffect, useRef } from 'react';
-import { BlockTemplate } from '../types/curricular';
+import React, { useState, useEffect, useRef } from 'react';
+import { BlockTemplate } from '../types/curricular.ts';
 import { BlockTemplateEditor } from '../components/BlockTemplateEditor';
 import { BlockTemplateViewer } from '../components/BlockTemplateViewer';
 import { ContextSidebarPanel } from '../components/ContextSidebarPanel';
 import { FormatStylePanel } from '../components/FormatStylePanel';
 import { TwoPaneLayout } from '../layout/TwoPaneLayout';
-import { VisualTemplate, BlockAspect } from '../types/visual';
-import { exportBlock, importBlock } from '../utils/block-io';
-import type { EditorSidebarState } from '../types/panel';
+import { VisualTemplate, BlockAspect } from '../types/visual.ts';
+import { exportBlock, importBlock } from '../utils/block-io.ts';
+import type { EditorSidebarState } from '../types/panel.ts';
 
 
 const generateEmptyTemplate = (): BlockTemplate =>
@@ -63,22 +63,9 @@ export const BlockEditorScreen: React.FC<BlockEditorScreenProps> = ({
   const [editorSidebar, setEditorSidebar] = useState<EditorSidebarState | null>(null);
 
   // Selección en modo vista
-  const [selectedCoord, setSelectedCoord] = useState<{ row: number; col: number } | undefined>(undefined);
-  useEffect(() => { setSelectedCoord(undefined); }, [mode]);
-
-  const selectedCell =
-    selectedCoord ? template[selectedCoord.row]?.[selectedCoord.col] : null;
-
-  const handleUpdateCell = (
-    update: Partial<BlockTemplate[number][number]>,
-    coord: { row: number; col: number }
-  ) => {
-    setTemplate((prev) => {
-      const next = prev.map((r) => r.map((c) => ({ ...c }))) as BlockTemplate;
-      Object.assign(next[coord.row][coord.col], update);
-      return next;
-    });
-  };
+    const [selectedCoord, setSelectedCoord] =
+      useState<{ row: number; col: number } | undefined>(undefined);
+    useEffect(() => { setSelectedCoord(undefined); }, [mode]);
 
   const header = (
     <div className="header-controls">

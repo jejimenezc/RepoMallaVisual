@@ -1,6 +1,6 @@
 // src/utils/block-io.ts
-import type { BlockTemplate } from '../types/curricular';
-import type { VisualTemplate, BlockAspect } from '../types/visual';
+import type { BlockTemplate } from '../types/curricular.ts';
+import type { VisualTemplate, BlockAspect } from '../types/visual.ts';
 
 export interface BlockExport {
   version: number;
