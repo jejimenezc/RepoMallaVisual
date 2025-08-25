@@ -78,6 +78,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
   const [rows, setRows] = useState(5);
   const [pieces, setPieces] = useState<CurricularPiece[]>([]);
   const [pieceValues, setPieceValues] = useState<Record<string, Record<string, string | number>>>({});
+  const [floatingPieces, setFloatingPieces] = useState<string[]>([]);
 
   // --- drag & drop
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -108,6 +109,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
       y: 0,
     };
     setPieces((prev) => [...prev, piece]);
+    setFloatingPieces((prev) => [...prev, id]);
   };
 
   const handleAddSnapshot = () => {
@@ -124,6 +126,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
       origin: { sourceId: 'master', bounds, aspect }, // para poder "descongelar"
     };
     setPieces((prev) => [...prev, piece]);
+    setFloatingPieces((prev) => [...prev, id]);
   };
 
   // --- TOGGLE: congelar ↔ descongelar
@@ -192,8 +195,10 @@ export const MallaEditorScreen: React.FC<Props> = ({
           origin: src.origin ? { ...src.origin } : undefined,
         };
       }
-      return [...prev, clone];
+      const next = [...prev, clone];
+      return next;
     });
+    setFloatingPieces((prev) => [...prev, newId]);
 
     // Duplicar también los valores de usuario de la pieza
     setPieceValues((prev) => {
@@ -225,6 +230,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
     dragOffset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     dragPieceOuter.current = { w: pieceOuterW, h: pieceOuterH };
     setDragPos({ x: piece.x * baseMetrics.outerW, y: piece.y * baseMetrics.outerH });
+    setFloatingPieces((prev) => prev.filter((id) => id !== piece.id));
     e.stopPropagation();
   };
 
@@ -323,26 +329,16 @@ export const MallaEditorScreen: React.FC<Props> = ({
             const canUnfreeze = p.kind === 'snapshot' && !!p.origin;
             const toggleLabel = p.kind === 'ref' ? '🧊 Congelar' : '🔗 Descongelar';
 
+            const floating = floatingPieces.includes(p.id);
             return (
               <div
                 key={p.id}
-                className="block-wrapper"
+                className={`block-wrapper${floating ? ' floating' : ''}`}
                 style={{ left, top, width: m.outerW, height: m.outerH, position: 'absolute' }}
                 onMouseDown={(e) => handleMouseDownPiece(e, p, m.outerW, m.outerH)}
               >
                 {/* Toolbar por pieza */}
-                <div
-                  className="piece-toolbar"
-                  style={{
-                    position: 'absolute',
-                    top: 4,
-                    right: 4,
-                    display: 'flex',
-                    gap: 4,
-                    zIndex: 1000,
-                    pointerEvents: 'auto',
-                  }}
-                >
+                <div className="piece-toolbar">
                   {/* Toggle congelar/descongelar */}
                   <button
                     type="button"
@@ -354,13 +350,8 @@ export const MallaEditorScreen: React.FC<Props> = ({
                     title={toggleLabel}
                     disabled={p.kind === 'snapshot' && !p.origin}
                     style={{
-                      fontSize: 12,
-                      padding: '2px 6px',
-                      lineHeight: 1.2,
-                      border: '1px solid #bbb',
                       background: p.kind === 'ref' || canUnfreeze ? '#fff' : '#eee',
                       color: p.kind === 'ref' || canUnfreeze ? 'inherit' : '#999',
-                      borderRadius: 6,
                       cursor: p.kind === 'ref' || canUnfreeze ? 'pointer' : 'not-allowed',
                     }}
                   >
@@ -375,15 +366,6 @@ export const MallaEditorScreen: React.FC<Props> = ({
                       duplicatePiece(p);
                     }}
                     title="Duplicar"
-                    style={{
-                      fontSize: 12,
-                      padding: '2px 6px',
-                      lineHeight: 1.2,
-                      border: '1px solid #bbb',
-                      background: '#fff',
-                      borderRadius: 6,
-                      cursor: 'pointer',
-                    }}
                   >
                     ⧉
                   </button>
@@ -396,15 +378,6 @@ export const MallaEditorScreen: React.FC<Props> = ({
                       deletePiece(p.id);
                     }}
                     title="Eliminar"
-                    style={{
-                      fontSize: 12,
-                      padding: '2px 6px',
-                      lineHeight: 1.2,
-                      border: '1px solid #bbb',
-                      background: '#fff',
-                      borderRadius: 6,
-                      cursor: 'pointer',
-                    }}
                   >
                     🗑️
                   </button>

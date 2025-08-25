@@ -176,7 +176,28 @@ export const cropVisualTemplate = (
       const style = visual[key];
       if (style) {
         const newKey = keyOf(r - b.minRow, c - b.minCol);
-        result[newKey] = style;
+
+        // Clonar para evitar mutar el estilo original
+        const cloned = { ...style } as typeof style;
+
+        // ✅ Rebase de coord de selectSource (si está dentro del recorte)
+        const src = cloned.conditionalBg?.selectSource;
+        if (src) {
+          const [sr, sc] = src.coord.split('-').map(Number);
+          const rr = sr - b.minRow;
+          const cc = sc - b.minCol;
+          if (rr >= 0 && rr < b.rows && cc >= 0 && cc < b.cols) {
+            cloned.conditionalBg = {
+              ...cloned.conditionalBg,
+              selectSource: { coord: keyOf(rr, cc), colors: { ...src.colors } },
+            };
+          } else {
+            const { selectSource: _selectSource, ...rest } = cloned.conditionalBg!;
+            cloned.conditionalBg = Object.keys(rest).length ? rest : undefined;
+          }
+        }
+
+        result[newKey] = cloned;
       }
     }
   }

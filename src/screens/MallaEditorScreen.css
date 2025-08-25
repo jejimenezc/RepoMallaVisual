@@ -41,6 +41,12 @@
   cursor: move;
 }
 
+/* Pieza recién agregada/duplicada: desplazada y con sombra */
+.block-wrapper.floating {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  transform: translate(10px, 10px);
+}
+
 .repo-snapshot {
   min-height: 160px;
   height: 100%;
@@ -68,6 +74,14 @@
   display: flex;
   gap: 4px;
   z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.block-wrapper:hover .piece-toolbar {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .piece-toolbar button {
