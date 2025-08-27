@@ -205,21 +205,75 @@ export const MallaEditorScreen: React.FC<Props> = ({
     }
   };
 
+  // --- validación de reducción de la macro-grilla
+  const handleRowsChange = (newRows: number) => {
+    if (newRows < rows) {
+      const blocker = pieces.find((p) => p.y >= newRows);
+      if (blocker) {
+        window.alert(
+          `Para reducir filas mueva o borre las piezas que ocupan la fila ${blocker.y + 1}`
+        );
+        return;
+      }
+    }
+    setRows(newRows);
+  };
+
+  const handleColsChange = (newCols: number) => {
+    if (newCols < cols) {
+      const blocker = pieces.find((p) => p.x >= newCols);
+      if (blocker) {
+        window.alert(
+          `Para reducir columnas mueva o borre las piezas que ocupan la columna ${blocker.x + 1}`
+        );
+        return;
+      }
+    }
+    setCols(newCols);
+  };
+
   // --- agregar piezas
+  const findFreeCell = () => {
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        if (!pieces.some((p) => p.x === x && p.y === y)) {
+          return { x, y };
+        }
+      }
+    }
+    return null;
+  };
+
   const handleAddReferenced = () => {
+    const pos = findFreeCell();
+    if (!pos) {
+      window.alert(
+        'No hay posiciones disponibles en la malla. Agregue filas/columnas o borre una pieza curricular.'
+      );
+      return;
+    }
+
     const id = crypto.randomUUID();
     const piece: CurricularPieceRef = {
       kind: 'ref',
       id,
       ref: { sourceId: 'master', bounds, aspect }, // guarda bounds completos
-      x: 0,
-      y: 0,
+      x: pos.x,
+      y: pos.y,
     };
     setPieces((prev) => [...prev, piece]);
     setFloatingPieces((prev) => [...prev, id]);
   };
 
   const handleAddSnapshot = () => {
+    const pos = findFreeCell();
+    if (!pos) {
+      window.alert(
+        'No hay posiciones disponibles en la malla. Agregue filas/columnas o borre una pieza curricular.'
+      );
+      return;
+    }
+
     const id = crypto.randomUUID();
     const snap = duplicateActiveCrop({ template, visual, aspect });
     const piece: CurricularPieceSnapshot = {
@@ -228,8 +282,8 @@ export const MallaEditorScreen: React.FC<Props> = ({
       template: snap.template,
       visual: snap.visual,
       aspect: snap.aspect,
-      x: 0,
-      y: 0,
+      x: pos.x,
+      y: pos.y,
       origin: { sourceId: 'master', bounds, aspect }, // para poder "descongelar"
     };
     setPieces((prev) => [...prev, piece]);
@@ -274,37 +328,38 @@ export const MallaEditorScreen: React.FC<Props> = ({
 
   // --- Duplicar pieza (mantiene kind y valores del usuario)
   const duplicatePiece = (src: CurricularPiece) => {
+    const pos = findFreeCell();
+    if (!pos) {
+      window.alert(
+        'No hay posiciones disponibles en la malla. Agregue filas/columnas o borre una pieza curricular.'
+      );
+      return;
+    }
+
     const newId = crypto.randomUUID();
 
-    setPieces((prev) => {
-      // Offset a la derecha una macrocelda si cabe
-      const newX = Math.min(cols - 1, src.x + 1);
-      const newY = src.y;
-
-      let clone: CurricularPiece;
-      if (src.kind === 'ref') {
-        clone = {
-          kind: 'ref',
-          id: newId,
-          ref: { ...src.ref },
-          x: newX,
-          y: newY,
-        };
-      } else {
-        clone = {
-          kind: 'snapshot',
-          id: newId,
-          template: structuredClone ? structuredClone(src.template) : JSON.parse(JSON.stringify(src.template)),
-          visual: structuredClone ? structuredClone(src.visual) : JSON.parse(JSON.stringify(src.visual)),
-          aspect: src.aspect,
-          x: newX,
-          y: newY,
-          origin: src.origin ? { ...src.origin } : undefined,
-        };
-      }
-      const next = [...prev, clone];
-      return next;
-    });
+    let clone: CurricularPiece;
+    if (src.kind === 'ref') {
+      clone = {
+        kind: 'ref',
+        id: newId,
+        ref: { ...src.ref },
+        x: pos.x,
+        y: pos.y,
+      };
+    } else {
+      clone = {
+        kind: 'snapshot',
+        id: newId,
+        template: structuredClone ? structuredClone(src.template) : JSON.parse(JSON.stringify(src.template)),
+        visual: structuredClone ? structuredClone(src.visual) : JSON.parse(JSON.stringify(src.visual)),
+        aspect: src.aspect,
+        x: pos.x,
+        y: pos.y,
+        origin: src.origin ? { ...src.origin } : undefined,
+      };
+    }
+    setPieces((prev) => [...prev, clone]);
     setFloatingPieces((prev) => [...prev, newId]);
 
     // Duplicar también los valores de usuario de la pieza
@@ -322,6 +377,34 @@ export const MallaEditorScreen: React.FC<Props> = ({
       delete next[id];
       return next;
     });
+  };
+
+    // --- completar o limpiar la macro-grilla
+  const handleFillGrid = () => {
+    setPieces((prev) => {
+      const occupied = new Set(prev.map((p) => `${p.x}-${p.y}`));
+      const additions: CurricularPiece[] = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (!occupied.has(`${c}-${r}`)) {
+            additions.push({
+              kind: 'ref',
+              id: crypto.randomUUID(),
+              ref: { sourceId: 'master', bounds, aspect },
+              x: c,
+              y: r,
+            });
+          }
+        }
+      }
+      return [...prev, ...additions];
+    });
+  };
+
+  const handleClearGrid = () => {
+    setPieces([]);
+    setPieceValues({});
+    setFloatingPieces([]);
   };
 
   // --- drag handlers
@@ -355,9 +438,47 @@ export const MallaEditorScreen: React.FC<Props> = ({
 
   const handleMouseUp = () => {
     if (!draggingId) return;
-    const col = Math.round(dragPos.x / baseMetrics.outerW);
-    const row = Math.round(dragPos.y / baseMetrics.outerH);
-    setPieces((prev) => prev.map((p) => (p.id === draggingId ? { ...p, x: col, y: row } : p)));
+    const desiredCol = Math.round(dragPos.x / baseMetrics.outerW);
+    const desiredRow = Math.round(dragPos.y / baseMetrics.outerH);
+    let placed = true;
+    setPieces((prev) => {
+      const occupied = new Set(
+        prev.filter((p) => p.id !== draggingId).map((p) => `${p.x}-${p.y}`)
+      );
+      const piece = prev.find((p) => p.id === draggingId);
+      if (!piece) return prev;
+      let targetCol = desiredCol;
+      let targetRow = desiredRow;
+      if (occupied.has(`${targetCol}-${targetRow}`)) {
+        let best: { col: number; row: number } | null = null;
+        let bestDist = Infinity;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (occupied.has(`${c}-${r}`)) continue;
+            const dist = Math.abs(c - desiredCol) + Math.abs(r - desiredRow);
+            if (dist < bestDist) {
+              bestDist = dist;
+              best = { col: c, row: r };
+            }
+          }
+        }
+        if (!best) {
+          placed = false;
+          return prev;
+        }
+        targetCol = best.col;
+        targetRow = best.row;
+      }
+      return prev.map((p) =>
+        p.id === draggingId ? { ...p, x: targetCol, y: targetRow } : p
+      );
+    });
+    if (!placed) {
+      window.alert(
+        'No hay posiciones disponibles en la malla. Agregue filas/columnas o borre una pieza curricular.'
+      );
+      setFloatingPieces((prev) => [...prev, draggingId]);
+    }
     setDraggingId(null);
   };
 
@@ -382,11 +503,20 @@ export const MallaEditorScreen: React.FC<Props> = ({
           <h2>Editor de Malla</h2>
           <label>
             Filas
-            <input type="number" min={1} value={rows} onChange={(e) => setRows(Number(e.target.value))} />
-          </label>
+            <input
+              type="number"
+              min={1}
+              value={rows}
+              onChange={(e) => handleRowsChange(Number(e.target.value))}
+            />          </label>
           <label>
             Columnas
-            <input type="number" min={1} value={cols} onChange={(e) => setCols(Number(e.target.value))} />
+            <input
+              type="number"
+              min={1}
+              value={cols}
+              onChange={(e) => handleColsChange(Number(e.target.value))}
+            />
           </label>
           <div className="persist-controls">
             <button type="button" onClick={handleSave}>Guardar</button>
@@ -400,6 +530,8 @@ export const MallaEditorScreen: React.FC<Props> = ({
               onChange={handleFileChange}
             />
           </div>
+          <button type="button" onClick={handleFillGrid}>Generar malla completa</button>
+          <button type="button" onClick={handleClearGrid}>Borrar malla completa</button>          
         </div>
 
         <div

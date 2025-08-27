@@ -31,14 +31,16 @@
 .malla-area {
   flex: 1;
   position: relative;
-  background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
-    linear-gradient(to bottom, #ddd 1px, transparent 1px);
+  background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+    linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
   background-size: calc(100% / var(--cols)) calc(100% / var(--rows));
 }
 
 .block-wrapper {
   position: absolute;
   cursor: move;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
 }
 
 /* Pieza recién agregada/duplicada: desplazada y con sombra */

@@ -270,12 +270,14 @@ export const TemplateCell: React.FC<Props> = ({
             </label>
           </div>
         ) : applyVisual && cell.type === 'select' ? (
-        <select 
+        <select
           className="select-input"
           style={contentStyle}
           value={String(values[valueKey] ?? '')}
-          onChange={(e) => onValueChange?.(valueKey, e.target.value)}          
+          onChange={(e) => onValueChange?.(valueKey, e.target.value)}
         >
+          {/* Opción en blanco por defecto para evitar cambios iniciales de color */}
+          <option value=""></option>
           {(cell.dropdownOptions ?? []).map((opt, idx) => (
             <option key={idx} value={opt}>
               {opt}
