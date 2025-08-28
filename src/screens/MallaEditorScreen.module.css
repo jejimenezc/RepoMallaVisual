@@ -1,5 +1,5 @@
-/* src/screens/MallaEditorScreen.css */
-.malla-screen {
+/* src/screens/MallaEditorScreen.module.css */
+.mallaScreen {
   display: flex;
   height: 100%;
 }
@@ -14,13 +14,13 @@
   gap: 0.5rem;
 }
 
-.malla-wrapper {
+.mallaWrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.grid-controls {
+.gridControls {
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem;
@@ -28,7 +28,7 @@
   background: #fff;
 }
 
-.malla-area {
+.mallaArea {
   flex: 1;
   position: relative;
   background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px),
@@ -36,7 +36,7 @@
   background-size: calc(100% / var(--cols)) calc(100% / var(--rows));
 }
 
-.block-wrapper {
+.blockWrapper {
   position: absolute;
   cursor: move;
   border: 1px solid #d1d5db;
@@ -44,14 +44,14 @@
 }
 
 /* Pieza recién agregada/duplicada: desplazada y con sombra */
-.block-wrapper.floating {
+.blockWrapper.floating {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.50);
   transform: translate(20px, 20px);
   z-index: 900;
 
 }
 
-.repo-snapshot {
+.repoSnapshot {
   min-height: 160px;
   height: 100%;
   border: 1px dashed #ccc;
@@ -61,34 +61,34 @@
   overflow: hidden;
 }
 
-.repo-actions {
+.repoActions {
   display: grid;
   gap: 0.5rem;
 }
 
-.repo-actions button {
+.repoActions button {
   width: 100%;
 }
 
 /* Toolbar flotante por pieza (arriba a la derecha) */
-.piece-toolbar {
+.pieceToolbar {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: var(--grid-pad);
+  right: var(--grid-pad);
   display: flex;
-  gap: 4px;
+  gap: var(--grid-pad);
   z-index: 1000;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s;
 }
 
-.block-wrapper:hover .piece-toolbar {
+.blockWrapper:hover .pieceToolbar {
   opacity: 1;
   pointer-events: auto;
 }
 
-.piece-toolbar button {
+.pieceToolbar button {
   font-size: 12px;
   padding: 2px 6px;
   line-height: 1.2;
@@ -98,6 +98,6 @@
   cursor: pointer;
 }
 
-.piece-toolbar button:hover {
+.pieceToolbar button {
   background: #f0f0f0;
 }

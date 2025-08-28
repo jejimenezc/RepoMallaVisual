@@ -1,3 +1,8 @@
+:root {
+  --grid-gap: 2px;
+  --grid-pad: 4px;
+}
+
 body {
   margin: 0;
   background-color: #f4f4f4;

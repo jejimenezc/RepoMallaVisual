@@ -4,6 +4,7 @@ import React from 'react';
 import { BlockTemplate } from '../types/curricular';
 import { TemplateCell } from './TemplateCell';
 import { VisualTemplate } from '../types/visual';
+import './BlockTemplateEditor.css';
 
 interface Props {
   template: BlockTemplate;

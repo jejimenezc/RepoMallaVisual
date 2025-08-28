@@ -1,18 +1,18 @@
-/* src/App.css */
-.app-container {
+/* src/App.module.css */
+.appContainer {
   display: flex;
   flex-direction: column;
   height: 100vh;
   font-family: sans-serif;
 }
 
-.app-header {
+.appHeader {
   padding: 1rem;
   background-color: #f5f5f5;
   border-bottom: 1px solid #ddd;
 }
 
-.app-main {
+.appMain {
   flex: 1;
   display: flex;
   flex-direction: column;

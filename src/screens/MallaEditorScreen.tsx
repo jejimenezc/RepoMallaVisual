@@ -18,11 +18,9 @@ import {
 import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
 import { duplicateActiveCrop } from '../utils/block-clone.ts';
 import { exportMalla, importMalla } from '../utils/malla-io.ts';
-import './MallaEditorScreen.css';
+import styles from './MallaEditorScreen.module.css';
+import { GRID_GAP, GRID_PAD } from '../styles/constants.ts';
 
-/** Mantener estos valores en sync con .template-grid (BlockTemplateEditor.css) */
-const GRID_GAP = 2; // px
-const GRID_PAD = 4; // px
 const STORAGE_KEY = 'malla-editor-state';
 
 /** Cálculo unificado de métricas de una pieza (recorte) */
@@ -41,8 +39,8 @@ function computeMetrics(tpl: BlockTemplate, aspect: BlockAspect) {
     height: contentH,
     gridTemplateColumns: `repeat(${cols}, ${cellW}px)`,
     gridTemplateRows: `repeat(${rows}, ${cellH}px)`,
-    padding: GRID_PAD,
-    gap: GRID_GAP,
+    padding: 'var(--grid-pad)',
+    gap: 'var(--grid-gap)',
   };
 
   return { cellW, cellH, cols, rows, contentW, contentH, outerW, outerH, gridStyle };
@@ -483,23 +481,23 @@ export const MallaEditorScreen: React.FC<Props> = ({
   };
 
   return (
-    <div className="malla-screen">
-      <div className="repository">
+    <div className={styles.mallaScreen}>
+      <div className={styles.repository}>
         {onBack && <button onClick={onBack}>⬅️ Volver</button>}
         <h3>Repositorio</h3>
 
-        <div className="repo-snapshot">
+        <div className={styles.repoSnapshot}>
           <BlockSnapshot template={template} visualTemplate={visual} aspect={aspect} />
         </div>
 
-        <div className="repo-actions">
+        <div className={styles.repoActions}>
           <button onClick={handleAddReferenced}>Agregar bloque (referenciado)</button>
           <button onClick={handleAddSnapshot}>Agregar bloque (snapshot)</button>
         </div>
       </div>
 
-      <div className="malla-wrapper">
-        <div className="grid-controls">
+      <div className={styles.mallaWrapper}>
+        <div className={styles.gridControls}>
           <h2>Editor de Malla</h2>
           <label>
             Filas
@@ -518,7 +516,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
               onChange={(e) => handleColsChange(Number(e.target.value))}
             />
           </label>
-          <div className="persist-controls">
+          <div>
             <button type="button" onClick={handleSave}>Guardar</button>
             <button type="button" onClick={handleLoadClick}>Cargar</button>
             <button type="button" onClick={handleRestoreDraft}>Recuperar borrador</button>
@@ -535,7 +533,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
         </div>
 
         <div
-          className="malla-area"
+          className={styles.mallaArea}
           ref={gridRef}
           style={gridAreaStyle}
           onMouseMove={handleMouseMove}
@@ -582,14 +580,14 @@ export const MallaEditorScreen: React.FC<Props> = ({
 
             const floating = floatingPieces.includes(p.id);
             return (
-              <div
-                key={p.id}
-                className={`block-wrapper${floating ? ' floating' : ''}`}
-                style={{ left, top, width: m.outerW, height: m.outerH, position: 'absolute' }}
-                onMouseDown={(e) => handleMouseDownPiece(e, p, m.outerW, m.outerH)}
-              >
-                {/* Toolbar por pieza */}
-                <div className="piece-toolbar">
+                <div
+                  key={p.id}
+                  className={`${styles.blockWrapper} ${floating ? styles.floating : ''}`}
+                  style={{ left, top, width: m.outerW, height: m.outerH, position: 'absolute' }}
+                  onMouseDown={(e) => handleMouseDownPiece(e, p, m.outerW, m.outerH)}
+                >
+                  {/* Toolbar por pieza */}
+                  <div className={styles.pieceToolbar}>
                   {/* Toggle congelar/descongelar */}
                   <button
                     type="button"

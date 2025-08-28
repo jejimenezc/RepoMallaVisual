@@ -3,6 +3,7 @@ import { BlockTemplate } from '../types/curricular';
 import { VisualTemplate, BlockAspect } from '../types/visual';
 import { TemplateGrid } from './TemplateGrid';
 import { getActiveBounds, cropTemplate, cropVisualTemplate } from '../utils/block-active';
+import { GRID_GAP, GRID_PAD } from '../styles/constants.ts';
 import './BlockSnapshot.css';
 
 interface Props {
@@ -40,16 +41,14 @@ export const BlockSnapshot: React.FC<Props> = ({ template, visualTemplate, aspec
   const rows = subTemplate.length;
 
   // Deben coincidir con tu CSS (.template-grid): ajusta si cambiaste estos valores
-  const GAP = 2;   // gap entre celdas en px
-  const PAD = 4;   // padding del contenedor .template-grid en px
 
   // Tamaño de CONTENIDO (celdas + gaps). OJO: sin padding.
-  const contentW = cols * cellW + Math.max(0, cols - 1) * GAP;
-  const contentH = rows * cellH + Math.max(0, rows - 1) * GAP;
+  const contentW = cols * cellW + Math.max(0, cols - 1) * GRID_GAP;
+  const contentH = rows * cellH + Math.max(0, rows - 1) * GRID_GAP;
 
   // Tamaño EXTERNO del grid (contenido + padding en los 4 lados)
-  const outerW = contentW + PAD * 2;
-  const outerH = contentH + PAD * 2;
+  const outerW = contentW + GRID_PAD * 2;
+  const outerH = contentH + GRID_PAD * 2;
 
   // Recalcular scale en función del contenedor y del tamaño externo
   useEffect(() => {
@@ -84,8 +83,8 @@ export const BlockSnapshot: React.FC<Props> = ({ template, visualTemplate, aspec
     height: contentH,
     gridTemplateColumns: `repeat(${cols}, ${cellW}px)`,
     gridTemplateRows: `repeat(${rows}, ${cellH}px)`,
-    padding: PAD,
-    gap: GAP,
+    padding: 'var(--grid-pad)',
+    gap: 'var(--grid-gap)',
   };
 
   return (

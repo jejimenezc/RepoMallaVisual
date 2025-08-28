@@ -5,7 +5,7 @@ import { BlockEditorScreen } from './screens/BlockEditorScreen';
 import { MallaEditorScreen } from './screens/MallaEditorScreen';
 import { BlockTemplate } from './types/curricular';
 import { VisualTemplate, BlockAspect } from './types/visual';
-import './App.css';
+import styles from './App.module.css';
 
 export default function App(): JSX.Element {
   const [stage, setStage] = useState<'block' | 'malla'>('block');
@@ -30,9 +30,9 @@ export default function App(): JSX.Element {
   };
   
   return (
-    <div className="app-container">
-      <header className="app-header"><h1>Mallas Curriculares</h1></header>
-      <main className="app-main">
+    <div className={styles.appContainer}>
+      <header className={styles.appHeader}><h1>Mallas Curriculares</h1></header>
+      <main className={styles.appMain}>
         {stage === 'block' && (
           <BlockEditorScreen onProceedToMalla={handleProceed} />
         )}
