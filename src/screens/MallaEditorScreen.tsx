@@ -17,7 +17,7 @@ import type { VisualTemplate, BlockAspect } from '../types/visual.ts';
   } from '../utils/block-active.ts';
   import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
   import { duplicateActiveCrop } from '../utils/block-clone.ts';
-  import { exportMalla, importMalla } from '../utils/malla-io.ts';
+import { exportMalla, importMalla, type MallaExport } from '../utils/malla-io.ts';
   import { createLocalStorageMasterRepository } from '../utils/master-repo.ts';
 import styles from './MallaEditorScreen.module.css';
 import { GRID_GAP, GRID_PAD } from '../styles/constants.ts';
@@ -66,6 +66,7 @@ interface Props {
       aspect: BlockAspect;
     } | null>
   >;
+  initialMalla?: MallaExport;
 }
 
 export const MallaEditorScreen: React.FC<Props> = ({
@@ -74,6 +75,7 @@ export const MallaEditorScreen: React.FC<Props> = ({
   aspect,
   onBack,
   onUpdateMaster,
+  initialMalla,
 }) => {
   // --- maestro + recorte activo
   const bounds = useMemo(() => getActiveBounds(template), [template]);
@@ -81,11 +83,15 @@ export const MallaEditorScreen: React.FC<Props> = ({
   const baseMetrics = useMemo(() => computeMetrics(subTemplate, aspect), [subTemplate, aspect]);
 
   // --- malla y piezas
-  const [cols, setCols] = useState(5);
-  const [rows, setRows] = useState(5);
-  const [pieces, setPieces] = useState<CurricularPiece[]>([]);
-  const [pieceValues, setPieceValues] = useState<Record<string, Record<string, string | number | boolean>>>({});
-  const [floatingPieces, setFloatingPieces] = useState<string[]>([]);
+  const [cols, setCols] = useState(initialMalla?.grid?.cols ?? 5);
+  const [rows, setRows] = useState(initialMalla?.grid?.rows ?? 5);
+  const [pieces, setPieces] = useState<CurricularPiece[]>(initialMalla?.pieces ?? []);
+  const [pieceValues, setPieceValues] = useState<
+    Record<string, Record<string, string | number | boolean>>
+  >(initialMalla?.values ?? {});
+  const [floatingPieces, setFloatingPieces] = useState<string[]>(
+    initialMalla?.floatingPieces ?? []
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const saveTimer = useRef<number | null>(null);
 

@@ -9,10 +9,17 @@ interface LS {
   removeItem(k: string): void;
 }
 
-const g = globalThis as unknown as { localStorage?: LS };
+const g = globalThis as unknown as {
+  localStorage?: LS;
+  window?: { localStorage?: LS };
+};
+
+function getLocalStorage(): LS | undefined {
+  return g.localStorage ?? g.window?.localStorage;
+}
 
 function readAll(): Record<string, MasterBlockData> {
-  const ls = g.localStorage;
+  const ls = getLocalStorage();
   if (!ls) return {};
   try {
     const raw = ls.getItem(STORAGE_KEY);
@@ -24,7 +31,7 @@ function readAll(): Record<string, MasterBlockData> {
 }
 
 function writeAll(data: Record<string, MasterBlockData>): void {
-  const ls = g.localStorage;
+  const ls = getLocalStorage();
   if (!ls) return;
   try {
     ls.setItem(STORAGE_KEY, JSON.stringify(data));

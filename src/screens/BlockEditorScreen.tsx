@@ -8,6 +8,7 @@ import { FormatStylePanel } from '../components/FormatStylePanel';
 import { TwoPaneLayout } from '../layout/TwoPaneLayout';
 import { VisualTemplate, BlockAspect } from '../types/visual.ts';
 import { exportBlock, importBlock } from '../utils/block-io.ts';
+import type { BlockExport } from '../utils/block-io.ts';
 import type { EditorSidebarState } from '../types/panel.ts';
 
 
@@ -22,16 +23,32 @@ interface BlockEditorScreenProps {
     visual: VisualTemplate,
     aspect: BlockAspect
   ) => void;
+  initialData?: BlockExport;
 }
 
 export const BlockEditorScreen: React.FC<BlockEditorScreenProps> = ({
   onProceedToMalla,
+  initialData,
 }) => {
   const [mode, setMode] = useState<'edit' | 'view'>('edit');
-  const [template, setTemplate] = useState<BlockTemplate>(generateEmptyTemplate());
-  const [visual, setVisual] = useState<VisualTemplate>({}); // mapa visual separado
-  const [aspect, setAspect] = useState<BlockAspect>('1/1');
+  const [template, setTemplate] = useState<BlockTemplate>(
+    initialData?.template ?? generateEmptyTemplate()
+  );
+  const [visual, setVisual] = useState<VisualTemplate>(
+    initialData?.visual ?? {}
+  ); // mapa visual separado
+  const [aspect, setAspect] = useState<BlockAspect>(
+    initialData?.aspect ?? '1/1'
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+    if (initialData) {
+      setTemplate(initialData.template);
+      setVisual(initialData.visual);
+      setAspect(initialData.aspect);
+    }
+  }, [initialData]);
 
   const handleExport = () => {
     const json = exportBlock(template, visual, aspect);
