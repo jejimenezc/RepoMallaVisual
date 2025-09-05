@@ -87,3 +87,16 @@ export interface CurricularPieceSnapshot {
 }
 
 export type CurricularPiece = CurricularPieceRef | CurricularPieceSnapshot;
+
+export interface MasterBlockData {
+  template: BlockTemplate;
+  visual: VisualTemplate;
+  aspect: BlockAspect;
+}
+
+export interface MasterBlockRepository {
+  list(): string[];
+  load(id: string): MasterBlockData | null;
+  save(id: string, data: MasterBlockData): void;
+  remove(id: string): void;
+}

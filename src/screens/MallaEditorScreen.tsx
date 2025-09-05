@@ -9,15 +9,16 @@ import type {
 } from '../types/curricular.ts';
 import { TemplateGrid } from '../components/TemplateGrid';
 import type { VisualTemplate, BlockAspect } from '../types/visual.ts';
-import {
-  cropTemplate,
-  cropVisualTemplate,
-  getActiveBounds,
-  expandBoundsToMerges,
-} from '../utils/block-active.ts';
-import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
-import { duplicateActiveCrop } from '../utils/block-clone.ts';
-import { exportMalla, importMalla } from '../utils/malla-io.ts';
+  import {
+    cropTemplate,
+    cropVisualTemplate,
+    getActiveBounds,
+    expandBoundsToMerges,
+  } from '../utils/block-active.ts';
+  import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
+  import { duplicateActiveCrop } from '../utils/block-clone.ts';
+  import { exportMalla, importMalla } from '../utils/malla-io.ts';
+  import { createLocalStorageMasterRepository } from '../utils/master-repo.ts';
 import styles from './MallaEditorScreen.module.css';
 import { GRID_GAP, GRID_PAD } from '../styles/constants.ts';
 
@@ -88,6 +89,16 @@ export const MallaEditorScreen: React.FC<Props> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const saveTimer = useRef<number | null>(null);
 
+    // --- repositorio de maestros
+  const masterRepo = useMemo(() => createLocalStorageMasterRepository(), []);
+  const [availableMasters, setAvailableMasters] = useState<string[]>([]);
+  const [selectedMasterId, setSelectedMasterId] = useState('');
+  const [newMasterId, setNewMasterId] = useState('');
+
+  useEffect(() => {
+    setAvailableMasters(masterRepo.list());
+  }, [masterRepo]);
+
   // --- drag & drop
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
@@ -106,6 +117,33 @@ export const MallaEditorScreen: React.FC<Props> = ({
     [cols, rows, baseMetrics.outerW, baseMetrics.outerH]
   );
 
+  const handleSelectMaster = (id: string) => {
+    setSelectedMasterId(id);
+    const data = masterRepo.load(id);
+    if (data) {
+      onUpdateMaster?.({
+        template: data.template,
+        visual: data.visual,
+        aspect: data.aspect,
+      });
+    }
+  };
+
+  const handleSaveMaster = () => {
+    if (!newMasterId) return;
+    masterRepo.save(newMasterId, { template, visual, aspect });
+    setAvailableMasters(masterRepo.list());
+    setSelectedMasterId(newMasterId);
+    setNewMasterId('');
+  };
+
+  const handleDeleteMaster = () => {
+    if (!selectedMasterId) return;
+    masterRepo.remove(selectedMasterId);
+    setAvailableMasters(masterRepo.list());
+    setSelectedMasterId('');
+  };
+  
     // --- persistencia
   const handleSave = () => {
     const json = exportMalla({
@@ -485,6 +523,38 @@ export const MallaEditorScreen: React.FC<Props> = ({
       <div className={styles.repository}>
         {onBack && <button onClick={onBack}>⬅️ Volver</button>}
         <h3>Repositorio</h3>
+
+        <div className={styles.masterRepo}>
+          <select
+            value={selectedMasterId}
+            onChange={(e) => handleSelectMaster(e.target.value)}
+          >
+            <option value="">(Actual)</option>
+            {availableMasters.map((id) => (
+              <option key={id} value={id}>
+                {id}
+              </option>
+            ))}
+          </select>
+          <div className={styles.masterRepoActions}>
+            <input
+              type="text"
+              placeholder="Nombre"
+              value={newMasterId}
+              onChange={(e) => setNewMasterId(e.target.value)}
+            />
+            <button type="button" onClick={handleSaveMaster} disabled={!newMasterId}>
+              Guardar
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteMaster}
+              disabled={!selectedMasterId}
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
 
         <div className={styles.repoSnapshot}>
           <BlockSnapshot template={template} visualTemplate={visual} aspect={aspect} />
