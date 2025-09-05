@@ -20,6 +20,8 @@ export default function App(): JSX.Element {
     aspect: BlockAspect;
   } | null>(null);
   const [malla, setMalla] = useState<MallaExport | null>(null);
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState('');
 
   const handleProceed = (
     template: BlockTemplate,
@@ -43,11 +45,19 @@ export default function App(): JSX.Element {
         {location.pathname === '/' && (
           <HomeScreen
             onNewBlock={() => {
+              const name = prompt('Nombre del proyecto') || 'Sin nombre';
+              const id = crypto.randomUUID();
+              setProjectId(id);
+              setProjectName(name);
               setBlock(null);
               setMalla(null);
               navigate('/bloque');
             }}
             onLoadBlock={(data: BlockExport) => {
+              const name = prompt('Nombre del proyecto') || 'Importado';
+              const id = crypto.randomUUID();
+              setProjectId(id);
+              setProjectName(name);
               setBlock({
                 template: data.template,
                 visual: data.visual,
@@ -57,6 +67,10 @@ export default function App(): JSX.Element {
               navigate('/bloque');
             }}
             onLoadMalla={(data: MallaExport) => {
+              const name = prompt('Nombre del proyecto') || 'Importado';
+              const id = crypto.randomUUID();
+              setProjectId(id);
+              setProjectName(name);
               setBlock({
                 template: data.master.template,
                 visual: data.master.visual,
@@ -65,8 +79,30 @@ export default function App(): JSX.Element {
               setMalla(data);
               navigate('/malla');
             }}
+            onOpenProject={(id, data, name) => {
+              setProjectId(id);
+              setProjectName(name);
+              if ('master' in data) {
+                setBlock({
+                  template: data.master.template,
+                  visual: data.master.visual,
+                  aspect: data.master.aspect,
+                });
+                setMalla(data as MallaExport);
+                navigate('/malla');
+              } else {
+                const b = data as BlockExport;
+                setBlock({
+                  template: b.template,
+                  visual: b.visual,
+                  aspect: b.aspect,
+                });
+                setMalla(null);
+                navigate('/bloque');
+              }
+            }}
           />
-        )}
+    )}
         {location.pathname === '/bloque' && (
           <BlockEditorScreen
             onProceedToMalla={handleProceed}
@@ -75,6 +111,8 @@ export default function App(): JSX.Element {
                 ? { version: BLOCK_SCHEMA_VERSION, ...block }
                 : undefined
             }
+            projectId={projectId ?? undefined}
+            projectName={projectName}
           />
         )}
         {location.pathname === '/malla' && block && (
@@ -85,6 +123,8 @@ export default function App(): JSX.Element {
             onBack={() => navigate('/bloque')}
             onUpdateMaster={setBlock}
             initialMalla={malla ?? undefined}
+            projectId={projectId ?? undefined}
+            projectName={projectName}
           />
         )}
       </main>

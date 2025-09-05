@@ -1,5 +1,5 @@
 // src/screens/BlockEditorScreen.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { BlockTemplate } from '../types/curricular.ts';
 import { BlockTemplateEditor } from '../components/BlockTemplateEditor';
 import { BlockTemplateViewer } from '../components/BlockTemplateViewer';
@@ -9,6 +9,9 @@ import { TwoPaneLayout } from '../layout/TwoPaneLayout';
 import { VisualTemplate, BlockAspect } from '../types/visual.ts';
 import { exportBlock, importBlock } from '../utils/block-io.ts';
 import type { BlockExport } from '../utils/block-io.ts';
+import type { MallaExport } from '../utils/malla-io.ts';
+import { MALLA_SCHEMA_VERSION } from '../utils/malla-io.ts';
+import { createLocalStorageProjectRepository } from '../utils/master-repo.ts';
 import type { EditorSidebarState } from '../types/panel.ts';
 
 
@@ -24,11 +27,15 @@ interface BlockEditorScreenProps {
     aspect: BlockAspect
   ) => void;
   initialData?: BlockExport;
+  projectId?: string;
+  projectName?: string;
 }
 
 export const BlockEditorScreen: React.FC<BlockEditorScreenProps> = ({
   onProceedToMalla,
   initialData,
+  projectId,
+  projectName,
 }) => {
   const [mode, setMode] = useState<'edit' | 'view'>('edit');
   const [template, setTemplate] = useState<BlockTemplate>(
@@ -41,6 +48,10 @@ export const BlockEditorScreen: React.FC<BlockEditorScreenProps> = ({
     initialData?.aspect ?? '1/1'
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const projectRepo = useMemo(
+    () => createLocalStorageProjectRepository<MallaExport>(),
+    []
+  );
 
     useEffect(() => {
     if (initialData) {
@@ -49,6 +60,19 @@ export const BlockEditorScreen: React.FC<BlockEditorScreenProps> = ({
       setAspect(initialData.aspect);
     }
   }, [initialData]);
+
+  useEffect(() => {
+    if (!projectId) return;
+    const data: MallaExport = {
+      version: MALLA_SCHEMA_VERSION,
+      master: { template, visual, aspect },
+      grid: { cols: 5, rows: 5 },
+      pieces: [],
+      values: {},
+      floatingPieces: [],
+    };
+    projectRepo.save(projectId, projectName ?? 'Proyecto', data);
+  }, [template, visual, aspect, projectId, projectName, projectRepo]);
 
   const handleExport = () => {
     const json = exportBlock(template, visual, aspect);

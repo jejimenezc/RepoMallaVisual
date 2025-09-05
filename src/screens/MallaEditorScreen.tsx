@@ -17,8 +17,16 @@ import type { VisualTemplate, BlockAspect } from '../types/visual.ts';
   } from '../utils/block-active.ts';
   import { BlockSnapshot, getCellSizeByAspect } from '../components/BlockSnapshot';
   import { duplicateActiveCrop } from '../utils/block-clone.ts';
-import { exportMalla, importMalla, type MallaExport } from '../utils/malla-io.ts';
-  import { createLocalStorageMasterRepository } from '../utils/master-repo.ts';
+import {
+  exportMalla,
+  importMalla,
+  type MallaExport,
+  MALLA_SCHEMA_VERSION,
+} from '../utils/malla-io.ts';
+import {
+  createLocalStorageMasterRepository,
+  createLocalStorageProjectRepository,
+} from '../utils/master-repo.ts';
 import styles from './MallaEditorScreen.module.css';
 import { GRID_GAP, GRID_PAD } from '../styles/constants.ts';
 
@@ -67,6 +75,8 @@ interface Props {
     } | null>
   >;
   initialMalla?: MallaExport;
+  projectId?: string;
+  projectName?: string;
 }
 
 export const MallaEditorScreen: React.FC<Props> = ({
@@ -76,6 +86,8 @@ export const MallaEditorScreen: React.FC<Props> = ({
   onBack,
   onUpdateMaster,
   initialMalla,
+  projectId,
+  projectName,
 }) => {
   // --- maestro + recorte activo
   const bounds = useMemo(() => getActiveBounds(template), [template]);
@@ -94,6 +106,11 @@ export const MallaEditorScreen: React.FC<Props> = ({
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const saveTimer = useRef<number | null>(null);
+
+  const projectRepo = useMemo(
+    () => createLocalStorageProjectRepository<MallaExport>(),
+    []
+  );
 
     // --- repositorio de maestros
   const masterRepo = useMemo(() => createLocalStorageMasterRepository(), []);
@@ -212,19 +229,23 @@ export const MallaEditorScreen: React.FC<Props> = ({
     if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(() => {
       try {
-        const json = exportMalla({
+        const project: MallaExport = {
+          version: MALLA_SCHEMA_VERSION,
           master: { template, visual, aspect },
           grid: { cols, rows },
           pieces,
           values: pieceValues,
           floatingPieces,
-        });
-        window.localStorage.setItem(STORAGE_KEY, json);
+        };
+        window.localStorage.setItem(STORAGE_KEY, exportMalla(project));
+        if (projectId) {
+          projectRepo.save(projectId, projectName ?? 'Proyecto', project);
+        }
       } catch {
         /* ignore */
       }
     }, 300);
-  }, [template, visual, aspect, cols, rows, pieces, pieceValues, floatingPieces]);
+  }, [template, visual, aspect, cols, rows, pieces, pieceValues, floatingPieces, projectId, projectName, projectRepo]);
 
   const handleRestoreDraft = () => {
     if (typeof window === 'undefined') return;

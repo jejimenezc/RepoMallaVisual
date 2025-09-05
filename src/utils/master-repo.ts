@@ -63,3 +63,75 @@ export function createLocalStorageMasterRepository(): MasterBlockRepository {
     },
   };
 }
+
+// --- project repository with metadata ---
+
+export interface ProjectMeta {
+  name: string;
+  date: string; // ISO string
+}
+
+export interface ProjectRecord<T> {
+  meta: ProjectMeta;
+  data: T;
+}
+
+export interface ProjectRepository<T> {
+  list(): Array<{ id: string; name: string; date: string }>;
+  load(id: string): ProjectRecord<T> | null;
+  save(id: string, name: string, data: T): void;
+  remove(id: string): void;
+}
+
+const PROJECTS_KEY = 'projects-storage';
+
+function readProjects<T>(): Record<string, ProjectRecord<T>> {
+  const ls = getLocalStorage();
+  if (!ls) return {};
+  try {
+    const raw = ls.getItem(PROJECTS_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw) as Record<string, ProjectRecord<T>>;
+  } catch {
+    return {};
+  }
+}
+
+function writeProjects<T>(data: Record<string, ProjectRecord<T>>): void {
+  const ls = getLocalStorage();
+  if (!ls) return;
+  try {
+    ls.setItem(PROJECTS_KEY, JSON.stringify(data));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function createLocalStorageProjectRepository<T>(): ProjectRepository<T> {
+  return {
+    list() {
+      const all = readProjects<T>();
+      return Object.entries(all).map(([id, rec]) => ({
+        id,
+        name: rec.meta.name,
+        date: rec.meta.date,
+      }));
+    },
+    load(id) {
+      const all = readProjects<T>();
+      return all[id] ?? null;
+    },
+    save(id, name, data) {
+      const all = readProjects<T>();
+      all[id] = { meta: { name, date: new Date().toISOString() }, data };
+      writeProjects(all);
+    },
+    remove(id) {
+      const all = readProjects<T>();
+      if (id in all) {
+        delete all[id];
+        writeProjects(all);
+      }
+    },
+  };
+}
