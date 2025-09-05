@@ -1,5 +1,6 @@
 // src/screens/HomeScreen.tsx
 import React, { useRef, useState, useEffect, useMemo } from 'react';
+import { IntroOverlay } from '../components/IntroOverlay';
 import type { BlockExport } from '../utils/block-io.ts';
 import { importBlock } from '../utils/block-io.ts';
 import type { MallaExport } from '../utils/malla-io.ts';
@@ -31,10 +32,19 @@ export const HomeScreen: React.FC<Props> = ({
   const [projects, setProjects] = useState(
     () => repo.list()
   );
+  const [showIntro, setShowIntro] = useState(false);
 
   useEffect(() => {
     setProjects(repo.list());
   }, [repo]);
+
+  useEffect(() => {
+    const key = 'introOverlaySeen';
+    if (typeof window !== 'undefined' && !window.localStorage.getItem(key)) {
+      setShowIntro(true);
+      window.localStorage.setItem(key, 'true');
+    }
+  }, []);
 
   const handleLoadClick = () => {
     fileInputRef.current?.click();
@@ -97,6 +107,7 @@ export const HomeScreen: React.FC<Props> = ({
           </li>
         ))}
       </ul>
+      {showIntro && <IntroOverlay onClose={() => setShowIntro(false)} />}
     </div>
   );
 };

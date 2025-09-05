@@ -24,13 +24,27 @@ export const CellContextMenu: React.FC<CellContextMenuProps> = ({ x, y, onSelect
       style={{ top: y, left: x, position: 'absolute', backgroundColor: 'white', border: '1px solid #ccc', padding: '8px', zIndex: 1000 }}
       onMouseLeave={onClose}
     >
-      <div onClick={() => handleClick('staticText')}>🔒 Texto estático</div>
-      <div onClick={() => handleClick('text')}>📝 Texto libre</div>
-      <div onClick={() => handleClick('checkbox')}>☑️ Checkbox</div>
-      <div onClick={() => handleClick('select')}>🔽 Lista desplegable</div>
-      <div onClick={() => handleClick('number')}>🔢 Número</div>
-      <div onClick={() => handleClick('calculated')}>🧮 Campo calculado</div>
-      <div onClick={() => handleClick(undefined)}>🗑️ Borrar tipo</div>
+      <div title="Insertar texto estático" onClick={() => handleClick('staticText')}>
+        🔒 Texto estático
+      </div>
+      <div title="Insertar campo de texto" onClick={() => handleClick('text')}>
+        📝 Texto libre
+      </div>
+      <div title="Insertar casilla de verificación" onClick={() => handleClick('checkbox')}>
+        ☑️ Checkbox
+      </div>
+      <div title="Insertar lista desplegable" onClick={() => handleClick('select')}>
+        🔽 Lista desplegable
+      </div>
+      <div title="Insertar campo numérico" onClick={() => handleClick('number')}>
+        🔢 Número
+      </div>
+      <div title="Insertar campo calculado" onClick={() => handleClick('calculated')}>
+        🧮 Campo calculado
+      </div>
+      <div title="Borrar tipo" onClick={() => handleClick(undefined)}>
+        🗑️ Borrar tipo
+      </div>
     </div>
   );
 };

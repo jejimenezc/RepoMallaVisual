@@ -548,7 +548,11 @@ export const MallaEditorScreen: React.FC<Props> = ({
   return (
     <div className={styles.mallaScreen}>
       <div className={styles.repository}>
-        {onBack && <button onClick={onBack}>⬅️ Volver</button>}
+        {onBack && (
+          <button onClick={onBack} title="Volver a inicio">
+            ⬅️ Volver
+          </button>
+        )}
         <h3>Repositorio</h3>
 
         <div className={styles.masterRepo}>
@@ -570,13 +574,19 @@ export const MallaEditorScreen: React.FC<Props> = ({
               value={newMasterId}
               onChange={(e) => setNewMasterId(e.target.value)}
             />
-            <button type="button" onClick={handleSaveMaster} disabled={!newMasterId}>
+            <button
+              type="button"
+              onClick={handleSaveMaster}
+              disabled={!newMasterId}
+              title="Guardar maestro actual"
+            >
               Guardar
             </button>
             <button
               type="button"
               onClick={handleDeleteMaster}
               disabled={!selectedMasterId}
+              title="Eliminar maestro seleccionado"
             >
               Eliminar
             </button>
@@ -588,8 +598,18 @@ export const MallaEditorScreen: React.FC<Props> = ({
         </div>
 
         <div className={styles.repoActions}>
-          <button onClick={handleAddReferenced}>Agregar bloque (referenciado)</button>
-          <button onClick={handleAddSnapshot}>Agregar bloque (snapshot)</button>
+          <button
+            onClick={handleAddReferenced}
+            title="Agregar bloque sincronizado con el maestro"
+          >
+            Agregar bloque (referenciado)
+          </button>
+          <button
+            onClick={handleAddSnapshot}
+            title="Agregar copia estática del bloque actual"
+          >
+            Agregar bloque (snapshot)
+          </button>
         </div>
       </div>
 
@@ -614,9 +634,27 @@ export const MallaEditorScreen: React.FC<Props> = ({
             />
           </label>
           <div>
-            <button type="button" onClick={handleSave}>Guardar</button>
-            <button type="button" onClick={handleLoadClick}>Cargar</button>
-            <button type="button" onClick={handleRestoreDraft}>Recuperar borrador</button>
+            <button
+              type="button"
+              onClick={handleSave}
+              title="Guardar malla en archivo"
+            >
+              Guardar
+            </button>
+            <button
+              type="button"
+              onClick={handleLoadClick}
+              title="Cargar malla desde archivo"
+            >
+              Cargar
+            </button>
+            <button
+              type="button"
+              onClick={handleRestoreDraft}
+              title="Restaurar último borrador guardado"
+            >
+              Recuperar borrador
+            </button>
             <input
               type="file"
               accept="application/json"
@@ -625,8 +663,20 @@ export const MallaEditorScreen: React.FC<Props> = ({
               onChange={handleFileChange}
             />
           </div>
-          <button type="button" onClick={handleFillGrid}>Generar malla completa</button>
-          <button type="button" onClick={handleClearGrid}>Borrar malla completa</button>          
+          <button
+            type="button"
+            onClick={handleFillGrid}
+            title="Completar todas las posiciones vacías"
+          >
+            Generar malla completa
+          </button>
+          <button
+            type="button"
+            onClick={handleClearGrid}
+            title="Eliminar todas las piezas de la malla"
+          >
+            Borrar malla completa
+          </button>   
         </div>
 
         <div

@@ -135,10 +135,20 @@ export const ContextSidebarPanel: React.FC<Props> = ({
       </div>
 
       <div className="actions">
-        <button className="btn" disabled={!canCombine} onClick={onCombine}>
+        <button
+          className="btn"
+          disabled={!canCombine}
+          onClick={onCombine}
+          title="Combinar celdas seleccionadas"
+        >
           Combinar
         </button>
-        <button className="btn" disabled={!canSeparate} onClick={onSeparate}>
+        <button
+          className="btn"
+          disabled={!canSeparate}
+          onClick={onSeparate}
+          title="Separar celdas seleccionadas"
+        >
           Separar
         </button>
       </div>
